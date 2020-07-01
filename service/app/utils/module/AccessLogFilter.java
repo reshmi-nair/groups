@@ -12,11 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.telemetry.util.TelemetryEvents;
 import org.sunbird.telemetry.util.TelemetryWriter;
+import org.sunbird.util.JsonKey;
 import play.libs.streams.Accumulator;
 import play.mvc.EssentialAction;
 import play.mvc.EssentialFilter;
 import play.mvc.Result;
-import utils.JsonKey;
 
 public class AccessLogFilter extends EssentialFilter {
   private static final Logger logger = LoggerFactory.getLogger(AccessLogFilter.class);

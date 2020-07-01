@@ -20,9 +20,8 @@ public class ReadGroupController extends BaseController{
     }
 
     public CompletionStage<Result> readGroup(String groupId, Http.Request req) {
-        Request request = createSBRequest(req);
-        request.getRequest().put(JsonKey.GROUP_ID,groupId);
-        request.setOperation(ActorOperations.READ_GROUP.getValue());
+        Request request = createSBRequest(req, ActorOperations.READ_GROUP.getValue());
+        request.getRequest().put(JsonKey.GROUP_ID, groupId);
         return handleRequest(request);
     }
 }

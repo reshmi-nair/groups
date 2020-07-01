@@ -18,6 +18,7 @@ import org.sunbird.Application;
 import org.sunbird.exception.ActorServiceException;
 import org.sunbird.exception.BaseException;
 import org.sunbird.exception.ValidationException;
+import org.sunbird.models.ActorOperations;
 import org.sunbird.request.Request;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -103,7 +104,7 @@ public class BaseController extends Controller {
     }
   }
 
-  public Request createSBRequest(play.mvc.Http.Request httpReq) {
+  private Request createSBRequest(play.mvc.Http.Request httpReq) {
     // Copy body
     JsonNode requestData = httpReq.body().asJson();
     if (requestData == null || requestData.isMissingNode()) {
@@ -117,6 +118,12 @@ public class BaseController extends Controller {
     Request request = Json.fromJson(requestData, Request.class);
     request.setPath(httpReq.path());
 
+    return request;
+  }
+
+  public Request createSBRequest(play.mvc.Http.Request httpReq, String operation) {
+    Request request = createSBRequest(httpReq);
+    request.setOperation(operation);
     return request;
   }
 }

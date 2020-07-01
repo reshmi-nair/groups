@@ -28,9 +28,8 @@ public class HealthController extends BaseController {
    */
   public CompletionStage<Result> getServiceHealth(String serviceName, Http.Request req)
       throws BaseException {
-    Request request = createSBRequest(req);
+    Request request = createSBRequest(req, "health");
     request.getContext().put("service", serviceName);
-    request.setOperation("health");
     return handleRequest(request);
   }
 }

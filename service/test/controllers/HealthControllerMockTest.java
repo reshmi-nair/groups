@@ -25,7 +25,7 @@ public class HealthControllerMockTest extends TestHelper {
   public void testOnServerHandlerPasses() throws BaseException {
     setupMock();
     HealthController healthController = Mockito.mock(HealthController.class);
-    PowerMockito.when(healthController.createSBRequest(Mockito.any(Http.Request.class)))
+    PowerMockito.when(healthController.createSBRequest(Mockito.any(Http.Request.class),Mockito.anyString()))
         .thenThrow(new RuntimeException("induced due to buggy server impl"));
 
     Result result = performTest("/service/health", "GET", null, headerMap);

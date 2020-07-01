@@ -35,4 +35,13 @@ public interface JsonKey {
   String GROUP_ID = "groupId";
   String GROUP_DESC = "description";
   String GROUP_NAME = "name";
+  String URL = "url";
+  String LOG_TYPE = "logType";
+  String DURATION = "duration";
+  String STATUS = "status";
+  String INFO = "info";
+  String CONTEXT = "context";
+  String TELEMETRY_EVENT_TYPE = "telemetryEventType";
+  String PARAMS = "params";
+  String API_ACCESS = "api_access";
 }

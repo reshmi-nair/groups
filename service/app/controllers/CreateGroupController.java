@@ -18,8 +18,7 @@ public class CreateGroupController extends BaseController {
   }
 
   public CompletionStage<Result> createGroup(Http.Request req) {
-    Request request = createSBRequest(req);
-    request.setOperation(ActorOperations.CREATE_GROUP.getValue());
+    Request request = createSBRequest(req, ActorOperations.CREATE_GROUP.getValue());
     return handleRequest(request);
   }
 }
