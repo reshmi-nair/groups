@@ -7,15 +7,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.sunbird.exception.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.response.Response;
 import org.sunbird.util.JsonKey;
 import play.mvc.Result;
 
-public class BaseControllerTest extends TestHelper {
+public class BaseControllerTest extends BaseApplicationTest {
   Localizer localizer = Localizer.getInstance();
+
+  @Before
+  public void before() throws BaseException {
+    setup(DummyActor.class);
+  }
 
   public static String jsonify(Object response) {
     try {
@@ -47,7 +54,7 @@ public class BaseControllerTest extends TestHelper {
   public void testUnknownRouteFails() {
     Map<String, Object> reqMap = new HashMap<>();
     reqMap.put("accept", "yes");
-    Result result = performTest("/unknown", "POST", reqMap, headerMap);
+    Result result = performTest("/unknown", "POST", reqMap);
     assertTrue(
         getResponseStatus(result) == javax.ws.rs.core.Response.Status.NOT_FOUND.getStatusCode());
   }
