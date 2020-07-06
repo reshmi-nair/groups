@@ -2,7 +2,6 @@ package validators;
 
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,7 @@ public class ValidationUtil {
   private static Logger logger = LoggerFactory.getLogger(ValidationUtil.class);
 
   public static void validateRequestObject(Request request) throws BaseException {
-    if (MapUtils.isEmpty(request.getRequest())) {
+    if (request.getRequest().isEmpty()) {
       logger.error("validateMandatoryParamsOfStringType:incorrect request provided");
       throw new ValidationException.InvalidRequestData();
     }

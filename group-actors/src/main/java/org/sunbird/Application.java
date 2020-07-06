@@ -6,7 +6,6 @@ import java.util.List;
 import org.sunbird.actor.core.ActorCache;
 import org.sunbird.actor.core.ActorService;
 import org.sunbird.exception.BaseException;
-import org.sunbird.util.DBUtil;
 
 /** this class is used to instantiate the actor system. */
 public class Application {
@@ -26,7 +25,6 @@ public class Application {
     List<String> actorClassPaths = new ArrayList<>();
     actorClassPaths.add("org.sunbird");
     ActorService.getInstance().init(actorSystemName, actorClassPaths);
-    checkCassandraConnections();
   }
 
   /**
@@ -37,9 +35,5 @@ public class Application {
    */
   public ActorRef getActorRef(String operation) {
     return ActorCache.getActorRef(operation);
-  }
-
-  private static void checkCassandraConnections() throws BaseException {
-    DBUtil.checkCassandraDbConnections();
   }
 }

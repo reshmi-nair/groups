@@ -5,11 +5,10 @@
     <parent>
         <artifactId>sunbird-groups</artifactId>
         <groupId>org.sunbird</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cassandra-utils</artifactId>
-    <version>1.0.0</version>
     <properties>
         <version.compiler.plugin>2.3.1</version.compiler.plugin>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -46,7 +45,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.10.1</version>
+            <version>${jackson.version}</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.sunbird</groupId>-->

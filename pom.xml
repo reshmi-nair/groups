@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.sunbird</groupId>
     <artifactId>sunbird-groups</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <properties>
-        <project.version>1.0.0-SNAPSHOT</project.version>
+        <project.version>1.0.0</project.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <jackson.version>2.9.10</jackson.version>
+        <jackson.version>2.10.1</jackson.version>
         <akka.x.version>2.5.19</akka.x.version>
         <junit.version>4.12</junit.version>
 
@@ -33,10 +33,10 @@
 
     <modules>
         <module>sb-utils</module>
-        <module>group-actors</module>
-        <module>sb-actor</module>
-        <module>service</module>
-        <module>cassandra-utils</module>
         <module>sb-telemetry-utils</module>
+        <module>sb-actor</module>
+        <module>group-actors</module>
+        <module>cassandra-utils</module>
+        <module>service</module>
     </modules>
 </project>
