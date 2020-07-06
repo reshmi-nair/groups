@@ -21,7 +21,7 @@ public class CreateGroupActor extends BaseActor {
   public void onReceive(Request request) throws Throwable {
     String operation = request.getOperation();
     switch (operation) {
-      case "createGroup": // create Group
+      case "createGroup":
         createGroup(request);
         break;
       case "updateGroup":

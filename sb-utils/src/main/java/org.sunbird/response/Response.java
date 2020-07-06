@@ -15,6 +15,26 @@ public class Response implements Serializable, Cloneable {
   private int code = 200;
   private Map<String, Object> result = new HashMap<>();
 
+  public Response() {}
+
+  public Response(
+      String id,
+      String ver,
+      String ts,
+      Map<String, Object> result,
+      ResponseParams params,
+      int code) {
+    this.id = id;
+    this.ver = ver;
+    this.result = result;
+    this.params = params;
+    this.code = code;
+  }
+
+  public Response(Map<String, Object> result, int code) {
+    this.result = result;
+    this.code = code;
+  }
   /**
    * This will provide request unique id.
    *

@@ -1,9 +1,6 @@
 package org.sunbird.util;
 
-/**
- * This interface will contains all the constants that's used throughout this application.
- *
- */
+/** This interface will contains all the constants that's used throughout this application. */
 public interface JsonKey {
 
   String CLASS = "class";
@@ -44,4 +41,7 @@ public interface JsonKey {
   String TELEMETRY_EVENT_TYPE = "telemetryEventType";
   String PARAMS = "params";
   String API_ACCESS = "api_access";
+  String USER_ID = "userId";
+  String FILTERS = "filters";
+  String GROUP = "group";
 }

@@ -9,15 +9,16 @@ import org.sunbird.util.JsonKey;
 
 public class GroupReadRequestValidator implements IRequestValidator {
 
-    private static Logger logger = LoggerFactory.getLogger(GroupCreateRequestValidator.class);
+  private static Logger logger = LoggerFactory.getLogger(GroupCreateRequestValidator.class);
 
-    @Override
-    public boolean validate(Request request) throws BaseException {
-        logger.info(
-                "GroupCreateRequestValidator:started validating the request with request"
-                        + request.getRequest());
-        ValidationUtil.validateRequestObject(request);
-        ValidationUtil.validateMandatoryParamsOfStringType(request, Lists.newArrayList(JsonKey.GROUP_ID));
-        return true;
-    }
+  @Override
+  public boolean validate(Request request) throws BaseException {
+    logger.info(
+        "GroupCreateRequestValidator:started validating the request with request"
+            + request.getRequest());
+    ValidationUtil.validateRequestObject(request);
+    ValidationUtil.validateMandatoryParamsWithType(
+        request, Lists.newArrayList(JsonKey.GROUP_ID), String.class, true);
+    return true;
+  }
 }

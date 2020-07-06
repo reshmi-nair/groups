@@ -4,11 +4,15 @@
 
 #Health check
 GET  /health                                  @controllers.HealthController.getHealth()
-GET  /:service/health                      @controllers.HealthController.getServiceHealth(service:String, request: play.mvc.Http.Request)
+GET  /:service/health                         @controllers.HealthController.getServiceHealth(service:String, request: play.mvc.Http.Request)
 
 # Logs Management APIs
-# POST    /v1.3/system/log/update           @controllers.logsmanager.LogController.setLogLevel()
+# POST    /v1.3/system/log/update             @controllers.logsmanager.LogController.setLogLevel()
 # Group management APIs
-POST	/v1/group/create				            @controllers.CreateGroupController.createGroup(request: play.mvc.Http.Request)
-# POST	/v1/group/update				            @controllers.UpdateGroupController.updateGroup()
-GET	/v1/group/read/:groupId				            @controllers.ReadGroupController.readGroup(groupId: String, request: play.mvc.Http.Request)
+POST	/v1/group/create				      @controllers.CreateGroupController.createGroup(request: play.mvc.Http.Request)
+# POST	/v1/group/update				      @controllers.UpdateGroupController.updateGroup()
+GET	/v1/group/read/:groupId				      @controllers.ReadGroupController.readGroup(groupId: String, request: play.mvc.Http.Request)
+
+#Search APIs
+
+POST   /group/v1/list                         @controllers.SearchGroupController.searchGroup(request: play.mvc.Http.Request)

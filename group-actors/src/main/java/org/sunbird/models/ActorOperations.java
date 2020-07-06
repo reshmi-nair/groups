@@ -4,7 +4,8 @@ package org.sunbird.models;
 public enum ActorOperations {
   CREATE_GROUP("createGroup"),
   UPDATE_GROUP("updateGroup"),
-  READ_GROUP("readGroup");
+  READ_GROUP("readGroup"),
+  SEARCH_GROUP("searchGroup");
 
   private String value;
 

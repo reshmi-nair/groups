@@ -17,7 +17,8 @@ public class GroupCreateRequestValidator implements IRequestValidator {
         "GroupCreateRequestValidator:started validating the request with request"
             + request.getRequest());
     ValidationUtil.validateRequestObject(request);
-    ValidationUtil.validateMandatoryParamsOfStringType(request, Lists.newArrayList(JsonKey.GROUP_NAME));
+    ValidationUtil.validateMandatoryParamsWithType(
+        request, Lists.newArrayList(JsonKey.GROUP_NAME), String.class, true);
     return true;
   }
 }

@@ -10,35 +10,35 @@ import org.sunbird.service.impl.GroupServiceImpl;
 import org.sunbird.util.JsonKey;
 
 @ActorConfig(
-        tasks = {"readGroup"},
-        asyncTasks = {}
+  tasks = {"readGroup"},
+  asyncTasks = {}
 )
 public class ReadGroupActor extends BaseActor {
 
-    private GroupService groupService = GroupServiceImpl.getInstance();
+  private GroupService groupService = GroupServiceImpl.getInstance();
 
-    @Override
-    public void onReceive(Request request) throws Throwable {
-        String operation = request.getOperation();
-        switch (operation) {
-            case "readGroup": // read Group
-                readGroup(request);
-                break;
-            default:
-                onReceiveUnsupportedMessage("ReadGroupActor");
-        }
+  @Override
+  public void onReceive(Request request) throws Throwable {
+    String operation = request.getOperation();
+    switch (operation) {
+      case "readGroup":
+        readGroup(request);
+        break;
+      default:
+        onReceiveUnsupportedMessage("ReadGroupActor");
     }
-    /**
-     * This method will read group in cassandra based on group id.
-     *
-     * @param actorMessage
-     */
-    private void readGroup(Request actorMessage) throws BaseException {
-        logger.info("ReadGroup method call");
-        String groupId = (String)actorMessage.getRequest().get(JsonKey.GROUP_ID);
+  }
+  /**
+   * This method will read group in cassandra based on group id.
+   *
+   * @param actorMessage
+   */
+  private void readGroup(Request actorMessage) throws BaseException {
+    logger.info("ReadGroup method call");
+    String groupId = (String) actorMessage.getRequest().get(JsonKey.GROUP_ID);
 
-        Response response = groupService.readGroup(groupId);
-        response.setResponseCode(ResponseCode.OK.getCode());
-        sender().tell(response, self());
-    }
+    Response response = groupService.readGroup(groupId);
+    response.setResponseCode(ResponseCode.OK.getCode());
+    sender().tell(response, self());
+  }
 }

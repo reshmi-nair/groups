@@ -20,26 +20,50 @@ public class ValidationUtil {
     }
   }
 
-  public static void validateMandatoryParamsOfStringType(
-      Request request, List<String> mandatoryParamsList) throws BaseException {
+  public static void validateMandatoryParamsWithType(
+      Request request, List<String> mandatoryParamsList, Class<?> type, boolean validatePresence)
+      throws BaseException {
     Map<String, Object> reqMap = request.getRequest();
 
     for (String param : mandatoryParamsList) {
       if (!reqMap.containsKey(param)) {
         throw new ValidationException.MandatoryParamMissing(param);
       }
-      if (!(reqMap.get(param) instanceof String)) {
+
+      if (!(isInstanceOf(reqMap.get(param).getClass(), type))) {
         logger.error("validateMandatoryParamsOfStringType:incorrect request provided");
-        throw new ValidationException.ParamDataTypeError(param, "string");
+        throw new ValidationException.ParamDataTypeError(param, type.getName());
       }
-      validatePresence(param, (String) reqMap.get(param));
+
+      if (validatePresence) {
+        validatePresence(param, reqMap.get(param), type);
+      }
     }
   }
 
-  private static void validatePresence(String key, String value) throws BaseException {
-    if (StringUtils.isBlank(value)) {
-      logger.error("validatePresence:incorrect request provided");
-      throw new ValidationException.MandatoryParamMissing(key);
+  private static void validatePresence(String key, Object value, Class<?> type)
+      throws BaseException {
+    if (type == String.class) {
+      if (StringUtils.isBlank((String) value)) {
+        logger.error("validatePresence:incorrect request provided");
+        throw new ValidationException.MandatoryParamMissing(key);
+      }
+    } else if (type == Map.class) {
+      Map<String, Object> map = (Map<String, Object>) value;
+      if (map.isEmpty()) {
+        logger.error("validatePresence:incorrect request provided");
+        throw new ValidationException.MandatoryParamMissing(key);
+      }
+    } else if (type == List.class) {
+      List<?> list = (List<?>) value;
+      if (list.isEmpty()) {
+        logger.error("validatePresence:incorrect request provided");
+        throw new ValidationException.MandatoryParamMissing(key);
+      }
     }
+  }
+
+  private static boolean isInstanceOf(Class objClass, Class targetClass) {
+    return targetClass.isAssignableFrom(objClass);
   }
 }
