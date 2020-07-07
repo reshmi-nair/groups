@@ -2,12 +2,18 @@ package org.sunbird.dao.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.cassandra.CassandraOperation;
+import org.sunbird.common.CassandraUtil;
+import org.sunbird.common.Constants;
 import org.sunbird.dao.MemberDao;
 import org.sunbird.exception.BaseException;
 import org.sunbird.helper.ServiceFactory;
@@ -60,8 +66,22 @@ public class MemberDaoImpl implements MemberDao {
   }
 
   @Override
-  public Response removeMembers(List<String> members, String groupId) throws BaseException {
-    return null;
+  public Response editMembers(List<Member> member) throws BaseException {
+    List<Map<String, Map<String, Object>>> list = new ArrayList<>();
+    for (Member memberObj : member) {
+      list.add(CassandraUtil.batchUpdateQuery(memberObj));
+    }
+    for (Map<String, Map<String, Object>> record : list) {
+      Map<String, Object> nonPKRecord = record.get(Constants.NON_PRIMARY_KEY);
+      Map<String, Object> filteredNonPKRecord = nonPKRecord.entrySet()
+              .stream()
+              .filter(map -> (map.getValue() != null))
+              .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
+      record.put(Constants.NON_PRIMARY_KEY,filteredNonPKRecord);
+    }
+    Response response =
+            cassandraOperation.batchUpdate(DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, list);
+    return response;
   }
 
   @Override

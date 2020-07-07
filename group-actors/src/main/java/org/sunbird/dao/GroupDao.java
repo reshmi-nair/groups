@@ -10,7 +10,7 @@ public interface GroupDao {
 
   /**
    * This method will create group and return groupId as success response or throw
-   * ProjectCommonException.
+   * BaseException.
    *
    * @param groupObj Group Details.
    * @return group ID.
@@ -19,7 +19,7 @@ public interface GroupDao {
 
   /**
    * This method will read group based on Id and return response Object as success response or throw
-   * ProjectCommonException.
+   * BaseException.
    *
    * @param groupId
    * @return responseObj with Group Details.
@@ -43,4 +43,14 @@ public interface GroupDao {
    * @return responseObj with Group Details.
    */
   Response readGroups(List<String> groupIds) throws BaseException;
+
+  /**
+   * This method will update group and return success response or throw
+   * BaseException.
+   *
+   * @param groupObj Group Details.
+   * @return Response.
+   */
+  Response updateGroup(Group groupObj) throws BaseException;
+
 }

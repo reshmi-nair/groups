@@ -39,6 +39,8 @@ public interface JsonKey {
   String ADMIN = "admin";
   String ACTIVE = "active";
   String INACTIVE = "inactive";
+  String GROUP_MEMBERSHIP_TYPE = "membershipType";
+  String GROUP_STATUS = "status";
   String URL = "url";
   String LOG_TYPE = "logType";
   String DURATION = "duration";
@@ -51,4 +53,9 @@ public interface JsonKey {
   String FILTERS = "filters";
   String GROUP = "group";
   String MEMBER_ROLE = "memberRole";
+  String MEMBER_ADD = "add";
+  String MEMBER_EDIT = "edit";
+  String MEMBER_REMOVE = "remove";
+  String INVITE_ONLY = "invite_only";
+  String MODERATED = "moderated";
 }

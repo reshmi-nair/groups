@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sunbird.exception.BaseException;
 import org.sunbird.util.JsonKey;

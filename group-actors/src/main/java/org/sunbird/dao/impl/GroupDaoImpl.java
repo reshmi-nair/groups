@@ -1,7 +1,10 @@
 package org.sunbird.dao.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
+
+import java.sql.Timestamp;
 import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.dao.GroupDao;
 import org.sunbird.exception.BaseException;
@@ -29,7 +32,10 @@ public class GroupDaoImpl implements GroupDao {
 
   @Override
   public String createGroup(Group groupObj) throws BaseException {
-    Map<String, Object> map = mapper.convertValue(groupObj, Map.class);
+
+    Map<String, Object> map =
+            mapper.convertValue(groupObj, new TypeReference<Map<String, Object>>() {});
+    map.put("createdOn",new Timestamp(Calendar.getInstance().getTime().getTime()));
     cassandraOperation.insertRecord(DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, map);
     return (String) map.get(JsonKey.ID);
   }
@@ -57,6 +63,14 @@ public class GroupDaoImpl implements GroupDao {
     Response responseObj =
         cassandraOperation.getRecordsByProperties(
             DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, properties);
+    return responseObj;
+  }
+
+  @Override
+  public Response updateGroup(Group groupObj) throws BaseException {
+    Map<String, Object> map = mapper.convertValue(groupObj, Map.class);
+    map.put("updatedOn",new Timestamp(Calendar.getInstance().getTime().getTime()));
+    Response responseObj = cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, map);
     return responseObj;
   }
 }

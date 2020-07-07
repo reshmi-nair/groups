@@ -12,10 +12,11 @@ import org.sunbird.service.GroupService;
 import org.sunbird.service.MemberService;
 import org.sunbird.service.impl.GroupServiceImpl;
 import org.sunbird.service.impl.MemberServiceImpl;
+import org.sunbird.util.GroupRequestHandler;
 import org.sunbird.util.JsonKey;
 
 @ActorConfig(
-  tasks = {"createGroup", "updateGroup"},
+  tasks = {"createGroup"},
   asyncTasks = {}
 )
 public class CreateGroupActor extends BaseActor {
@@ -30,9 +31,6 @@ public class CreateGroupActor extends BaseActor {
       case "createGroup":
         createGroup(request);
         break;
-      case "updateGroup":
-        // updateGroup(request);
-        break;
       default:
         onReceiveUnsupportedMessage("CreateGroupActor");
     }
@@ -45,9 +43,9 @@ public class CreateGroupActor extends BaseActor {
   private void createGroup(Request actorMessage) throws BaseException {
     logger.info("CreateGroup method call");
 
-    Group group = new Group();
-    group.setName((String) actorMessage.getRequest().get(JsonKey.GROUP_NAME));
-    group.setDescription((String) actorMessage.getRequest().get(JsonKey.GROUP_DESC));
+    GroupRequestHandler requestHandler = new GroupRequestHandler();
+    Group group = requestHandler.handleCreateGroupRequest(actorMessage);
+
     String groupId = groupService.createGroup(group);
 
     // adding members to group
