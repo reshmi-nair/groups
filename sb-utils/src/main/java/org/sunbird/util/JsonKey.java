@@ -32,6 +32,13 @@ public interface JsonKey {
   String GROUP_ID = "groupId";
   String GROUP_DESC = "description";
   String GROUP_NAME = "name";
+  String MEMBERS = "members";
+  String MEMBER = "member";
+  String USER_ID = "userId";
+  String ROLE = "role";
+  String ADMIN = "admin";
+  String ACTIVE = "active";
+  String INACTIVE = "inactive";
   String URL = "url";
   String LOG_TYPE = "logType";
   String DURATION = "duration";
@@ -41,7 +48,7 @@ public interface JsonKey {
   String TELEMETRY_EVENT_TYPE = "telemetryEventType";
   String PARAMS = "params";
   String API_ACCESS = "api_access";
-  String USER_ID = "userId";
   String FILTERS = "filters";
   String GROUP = "group";
+  String MEMBER_ROLE = "memberRole";
 }

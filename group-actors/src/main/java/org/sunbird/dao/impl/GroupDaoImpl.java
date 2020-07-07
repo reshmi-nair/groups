@@ -1,10 +1,7 @@
 package org.sunbird.dao.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.dao.GroupDao;
 import org.sunbird.exception.BaseException;
@@ -45,26 +42,21 @@ public class GroupDaoImpl implements GroupDao {
   }
 
   @Override
-  public Response readGroupUuidsByUserId(String userId) throws BaseException {
-    UUID usrId = java.util.UUID.fromString(userId);
+  public Response readGroupIdsByUserId(String userId) throws BaseException {
     Response responseObj =
         cassandraOperation.getRecordsByProperty(
-            DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE_NAME, JsonKey.USER_ID, usrId);
+            DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE_NAME, JsonKey.USER_ID, userId);
     return responseObj;
   }
 
   @Override
-  public Response readGroups(List<UUID> groupIds) throws BaseException {
+  public Response readGroups(List<String> groupIds) throws BaseException {
+    Map<String, Object> properties = new HashMap<>();
+    properties.put(JsonKey.ID, groupIds);
+    properties.put(JsonKey.STATUS, JsonKey.ACTIVE);
     Response responseObj =
-        cassandraOperation.getRecordsByProperty(
-            DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, JsonKey.ID, new ArrayList<Object>(groupIds));
-    return responseObj;
-  }
-
-  @Override
-  public Response readAllGroups() throws BaseException {
-    Response responseObj =
-        cassandraOperation.getAllRecords(DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME);
+        cassandraOperation.getRecordsByProperties(
+            DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, properties);
     return responseObj;
   }
 }

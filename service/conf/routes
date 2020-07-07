@@ -15,4 +15,4 @@ GET	/v1/group/read/:groupId				      @controllers.ReadGroupController.readGroup(
 
 #Search APIs
 
-POST   /group/v1/list                         @controllers.SearchGroupController.searchGroup(request: play.mvc.Http.Request)
+POST   /v1/group/list                         @controllers.SearchGroupController.searchGroup(request: play.mvc.Http.Request)

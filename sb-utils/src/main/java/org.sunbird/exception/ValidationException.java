@@ -43,6 +43,19 @@ public class ValidationException {
     }
   }
 
+  public static class InvalidParamValue extends BaseException {
+    public InvalidParamValue(String paramValue, String paramName) {
+      super(
+          IResponseMessage.INVALID_PARAMETER_VALUE,
+          MessageFormat.format(
+              ValidationException.getLocalizedMessage(
+                  IResponseMessage.INVALID_PARAMETER_VALUE, null),
+              paramValue,
+              paramName),
+          400);
+    }
+  }
+
   private static String getLocalizedMessage(String key, Locale locale) {
     return localizer.getMessage(key, locale);
   }

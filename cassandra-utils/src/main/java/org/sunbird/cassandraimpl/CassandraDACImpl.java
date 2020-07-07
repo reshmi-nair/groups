@@ -167,4 +167,72 @@ public class CassandraDACImpl extends CassandraOperationImpl {
           ResponseCode.SERVER_ERROR.getCode());
     }
   }
+
+  public Response updateAddSetRecord(
+      String keySpace, String table, Map<String, Object> primaryKey, String column, Object value)
+      throws BaseException {
+    return updateSetRecord(keySpace, table, primaryKey, column, value, true);
+  }
+
+  public Response updateRemoveSetRecord(
+      String keySpace, String table, Map<String, Object> primaryKey, String column, Object value)
+      throws BaseException {
+    return updateSetRecord(keySpace, table, primaryKey, column, value, false);
+  }
+
+  public Response updateSetRecord(
+      String keySpace,
+      String table,
+      Map<String, Object> primaryKey,
+      String column,
+      Object value,
+      boolean add)
+      throws BaseException {
+    long startTime = System.currentTimeMillis();
+    logger.info("Cassandra Service updateSetRecord method started at == {}", startTime);
+
+    Update update = QueryBuilder.update(keySpace, table);
+    if (add) {
+      update.with(QueryBuilder.add(column, value));
+    } else {
+      update.with(QueryBuilder.remove(column, value));
+    }
+    if (MapUtils.isEmpty(primaryKey)) {
+      logger.error(
+          Constants.EXCEPTION_MSG_FETCH + table + " : primary key is a must for update call");
+      throw new BaseException(
+          IResponseMessage.SERVER_ERROR,
+          IResponseMessage.SERVER_ERROR,
+          ResponseCode.SERVER_ERROR.getCode());
+    }
+    Update.Where where = update.where();
+    for (Map.Entry<String, Object> filter : primaryKey.entrySet()) {
+      Object filterValue = filter.getValue();
+      if (filterValue instanceof List) {
+        where = where.and(QueryBuilder.in(filter.getKey(), filterValue));
+      } else {
+        where = where.and(QueryBuilder.eq(filter.getKey(), filter.getValue()));
+      }
+    }
+    Response response = new Response();
+    try {
+      logger.info("updateSetRecord: Update set Query:: " + update.toString());
+      connectionManager.getSession(keySpace).execute(update);
+      response.put(Constants.RESPONSE, Constants.SUCCESS);
+    } catch (Exception e) {
+      logger.error(Constants.EXCEPTION_MSG_FETCH + table + " : " + e.getMessage(), e);
+      throw new BaseException(
+          IResponseMessage.SERVER_ERROR,
+          IResponseMessage.SERVER_ERROR,
+          ResponseCode.SERVER_ERROR.getCode());
+    }
+    long stopTime = System.currentTimeMillis();
+    logger.info(
+        "Cassandra operation {} started at {} and completed at {}. Total time elapsed is {}",
+        "updateSetRecord",
+        startTime,
+        stopTime,
+        (stopTime - startTime));
+    return response;
+  }
 }

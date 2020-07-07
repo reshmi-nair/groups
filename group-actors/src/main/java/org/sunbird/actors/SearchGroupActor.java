@@ -6,6 +6,7 @@ import java.util.Map;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.ResponseCode;
+import org.sunbird.models.GroupResponse;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.GroupService;
@@ -41,8 +42,11 @@ public class SearchGroupActor extends BaseActor {
     logger.info("SearchGroup method call");
     Map<String, Object> searchQueryMap = request.getRequest();
     Map<String, Object> filterMap = (Map<String, Object>) searchQueryMap.get(JsonKey.FILTERS);
-    List<Map<String, Object>> groupDetails = groupService.searchGroup(filterMap);
+    List<GroupResponse> groupDetails = groupService.searchGroup(filterMap);
     Map<String, Object> result = new HashMap<>();
+    groupDetails.sort(
+        ((o1, o2) ->
+            o1.getMemberRole().compareTo(o2.getMemberRole()))); // sort group result by role
     result.put(JsonKey.GROUP, groupDetails);
     Response response = new Response(result, ResponseCode.OK.getCode());
     sender().tell(response, self());

@@ -66,4 +66,28 @@ public class ValidationUtil {
   private static boolean isInstanceOf(Class objClass, Class targetClass) {
     return targetClass.isAssignableFrom(objClass);
   }
+
+  /**
+   * @param reqMap
+   * @param params list of params to validate values it contains
+   * @param paramsValue for each params provided , add a values in the map key should be the
+   *     paramName , value should be list of paramValue it should be for example key=status
+   *     value=[active, inactive]
+   * @throws BaseException
+   */
+  public static void validateParamValue(
+      Map<String, Object> reqMap, List<String> params, Map<String, List<String>> paramsValue)
+      throws BaseException {
+    logger.info("validating Param Value for the params {} values {}", params, paramsValue);
+    for (String param : params) {
+      logger.info(" paramsValue.get(param) {}", paramsValue.get(param));
+      if (reqMap.containsKey(param) && StringUtils.isNotEmpty((String) reqMap.get(param))) {
+        List<String> values = paramsValue.get(param);
+        String paramValue = (String) reqMap.get(param);
+        if (!values.contains(paramValue)) {
+          throw new ValidationException.InvalidParamValue(paramValue, param);
+        }
+      }
+    }
+  }
 }

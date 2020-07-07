@@ -172,6 +172,38 @@ public class ValidationUtilTest {
     }
   }
 
+  @Test
+  public void validateParamValue() {
+    Map<String, List<String>> paramValue = new HashMap<>();
+    paramValue.put(JsonKey.STATUS, Lists.newArrayList(JsonKey.ACTIVE, JsonKey.INACTIVE));
+    paramValue.put(JsonKey.ROLE, Lists.newArrayList(JsonKey.ADMIN, JsonKey.MEMBER));
+    Map<String, Object> member = new HashMap<>();
+    member.put(JsonKey.STATUS, JsonKey.ACTIVE);
+    member.put(JsonKey.ROLE, JsonKey.ADMIN);
+    try {
+      ValidationUtil.validateParamValue(
+          member, Lists.newArrayList(JsonKey.STATUS, JsonKey.ROLE), paramValue);
+    } catch (BaseException ex) {
+      Assert.assertTrue(false);
+    }
+    Assert.assertTrue(true);
+  }
+
+  @Test
+  public void validateInvalidParam() {
+    Map<String, List<String>> paramValue = new HashMap<>();
+    paramValue.put(JsonKey.STATUS, Lists.newArrayList(JsonKey.ACTIVE, JsonKey.INACTIVE));
+    Map<String, Object> member = new HashMap<>();
+    member.put(JsonKey.STATUS, "notValid");
+    try {
+      ValidationUtil.validateParamValue(
+          member, Lists.newArrayList(JsonKey.STATUS, JsonKey.ROLE), paramValue);
+    } catch (BaseException ex) {
+      Assert.assertTrue(true);
+      Assert.assertEquals("INVALID_PARAMETER_VALUE", ex.getCode());
+    }
+  }
+
   private Request createRequestObject() {
     Request request = new Request();
     Map<String, Object> map = new HashMap<>();

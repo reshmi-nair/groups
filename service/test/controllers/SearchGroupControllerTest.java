@@ -24,7 +24,7 @@ public class SearchGroupControllerTest extends BaseApplicationTest {
     reqMap.put(JsonKey.FILTERS, filters);
     Map<String, Object> request = new HashMap<>();
     request.put("request", reqMap);
-    Result result = performTest("/group/v1/list", "POST", request);
+    Result result = performTest("/v1/group/list", "POST", request);
     assertTrue(getResponseStatus(result) == Response.Status.OK.getStatusCode());
   }
 }

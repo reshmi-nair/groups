@@ -495,4 +495,12 @@ public interface CassandraOperation {
   public Response updateRemoveMapRecord(
       String keySpace, String table, Map<String, Object> primaryKey, String column, String key)
       throws BaseException;
+
+  public Response updateAddSetRecord(
+      String keySpace, String table, Map<String, Object> primaryKey, String column, Object value)
+      throws BaseException;
+
+  public Response updateRemoveSetRecord(
+      String keySpace, String table, Map<String, Object> primaryKey, String column, Object value)
+      throws BaseException;
 }

@@ -7,14 +7,12 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -24,6 +22,7 @@ import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.cassandraimpl.CassandraOperationImpl;
 import org.sunbird.exception.BaseException;
 import org.sunbird.helper.ServiceFactory;
+import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.models.ActorOperations;
 import org.sunbird.request.Request;
@@ -42,25 +41,37 @@ public class SearchGroupActorTest extends BaseActorTest {
   public void setUp() throws Exception {
     PowerMockito.mockStatic(Localizer.class);
     when(Localizer.getInstance()).thenReturn(null);
-
     PowerMockito.mockStatic(ServiceFactory.class);
     cassandraOperation = mock(CassandraOperationImpl.class);
     when(ServiceFactory.getInstance()).thenReturn(cassandraOperation);
   }
 
   @Test
-  public void searchByEmptyFiltersReturnSuccessResponse() {
+  public void searchByUserIdFiltersReturnSuccessResponse() {
     TestKit probe = new TestKit(system);
     ActorRef subject = system.actorOf(props);
     Request reqObj = new Request();
     reqObj.setHeaders(headerMap);
     reqObj.setOperation(ActorOperations.SEARCH_GROUP.getValue());
     Map<String, Object> filters = new HashMap<>();
-
+    filters.put(JsonKey.USER_ID, "userid1");
     reqObj.getRequest().put(JsonKey.FILTERS, filters);
     try {
-      when(cassandraOperation.getAllRecords(Mockito.anyString(), Mockito.anyString()))
-          .thenReturn(getSearchResultResponse());
+      when(cassandraOperation.getRecordsByProperty(
+              Mockito.anyString(),
+              Mockito.anyString(),
+              Mockito.anyString(),
+              Matchers.eq("userid1")))
+          .thenReturn(getGroupSetByUserId());
+
+      when(cassandraOperation.getRecordsByProperties(
+              Mockito.anyString(), Mockito.anyString(), Mockito.anyMap(), Mockito.anyList()))
+          .thenReturn(getMemberResponseByGroupIds());
+
+      when(cassandraOperation.getRecordsByProperties(
+              Mockito.anyString(), Mockito.anyString(), Mockito.anyMap()))
+          .thenReturn(getGroupsDetailsResponse());
+
     } catch (BaseException be) {
       Assert.assertTrue(false);
     }
@@ -70,7 +81,7 @@ public class SearchGroupActorTest extends BaseActorTest {
   }
 
   @Test
-  public void searchByEmptyFiltersReturnAllGroups() {
+  public void searchByEmptyFiltersThrowsBaseException() {
     TestKit probe = new TestKit(system);
 
     ActorRef subject = system.actorOf(props);
@@ -80,54 +91,72 @@ public class SearchGroupActorTest extends BaseActorTest {
     Map<String, Object> filters = new HashMap<>();
 
     reqObj.getRequest().put(JsonKey.FILTERS, filters);
-    try {
-      when(cassandraOperation.getAllRecords(Mockito.anyString(), Mockito.anyString()))
-          .thenReturn(getSearchResultResponse());
-    } catch (BaseException be) {
-      Assert.assertTrue(false);
-    }
     subject.tell(reqObj, probe.getRef());
-    Response res = probe.expectMsgClass(Duration.ofSeconds(10), Response.class);
-    Assert.assertTrue(null != res && res.getResponseCode() == 200);
-    Map<String, Object> resultMap = res.getResult();
-    List<Map<String, Object>> groups = (List<Map<String, Object>>) resultMap.get(JsonKey.GROUP);
-    Assert.assertEquals(2, groups.size());
-    Assert.assertEquals("TestGroup1", groups.get(0).get("name"));
+
+    BaseException ex = probe.expectMsgClass(Duration.ofSeconds(10), BaseException.class);
+    Assert.assertEquals(IResponseMessage.MISSING_MANDATORY_PARAMS, ex.getMessage());
   }
 
-  @Test
-  public void searchByEmptyFiltersThrowBaseException() {
-    TestKit probe = new TestKit(system);
-
-    ActorRef subject = system.actorOf(props);
-    Request reqObj = new Request();
-    reqObj.setHeaders(headerMap);
-    reqObj.setOperation(ActorOperations.SEARCH_GROUP.getValue());
-    Map<String, Object> filters = new HashMap<>();
-
-    reqObj.getRequest().put(JsonKey.FILTERS, filters);
-    try {
-      when(cassandraOperation.getAllRecords(Mockito.anyString(), Mockito.anyString()))
-          .thenThrow(BaseException.class);
-    } catch (BaseException be) {
-      Assert.assertTrue(true);
-    }
-    subject.tell(reqObj, probe.getRef());
-  }
-
-  private Response getSearchResultResponse() {
+  private Response getGroupsDetailsResponse() {
     Map<String, Object> result = new HashMap<>();
     List<Map<String, Object>> groupList = new ArrayList<>();
     Map<String, Object> group1 = new HashMap<>();
     group1.put("name", "TestGroup1");
-    group1.put("id", "id1");
+    group1.put("id", "groupid1");
 
     Map<String, Object> group2 = new HashMap<>();
     group2.put("name", "TestGroup2");
-    group2.put("id", "id2");
+    group2.put("id", "groupid2");
     groupList.add(group1);
     groupList.add(group2);
     result.put(JsonKey.RESPONSE, groupList);
+    Response response = new Response();
+    response.putAll(result);
+    return response;
+  }
+
+  private Response getGroupSetByUserId() {
+    Map<String, Object> result = new HashMap<>();
+    List<Map<String, Object>> userGroupList = new ArrayList<>();
+    Map<String, Object> userGroup = new HashMap<>();
+    userGroup.put(JsonKey.USER_ID, "userid1");
+    Set<String> groupIdSet = new LinkedHashSet<>();
+    groupIdSet.add("groupid1");
+    groupIdSet.add("groupid2");
+    userGroup.put(JsonKey.GROUP_ID, groupIdSet);
+    userGroupList.add(userGroup);
+    result.put(JsonKey.RESPONSE, userGroupList);
+    Response response = new Response();
+    response.putAll(result);
+    return response;
+  }
+
+  private Response getDBEmptyResponse() {
+    Map<String, Object> result = new HashMap<>();
+    result.put(JsonKey.RESPONSE, new ArrayList<>());
+    Response response = new Response();
+    response.putAll(result);
+    return response;
+  }
+
+  private Response getMemberResponseByGroupIds() {
+    Map<String, Object> result = new HashMap<>();
+    List<Map<String, Object>> memberLists = new ArrayList<>();
+    Map<String, Object> member1 = new HashMap<>();
+    member1.put(JsonKey.USER_ID, "userid1");
+    member1.put(JsonKey.GROUP_ID, "groupid1");
+    member1.put(JsonKey.ROLE, "admin");
+    member1.put(JsonKey.STATUS, JsonKey.ACTIVE);
+    Map<String, Object> member2 = new HashMap<>();
+    member2.put(JsonKey.USER_ID, "userid1");
+    member2.put(JsonKey.GROUP_ID, "groupid2");
+    member2.put(JsonKey.ROLE, "member");
+    member2.put(JsonKey.STATUS, JsonKey.ACTIVE);
+
+    memberLists.add(member1);
+    memberLists.add(member2);
+
+    result.put(JsonKey.RESPONSE, memberLists);
     Response response = new Response();
     response.putAll(result);
     return response;

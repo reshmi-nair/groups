@@ -1,6 +1,26 @@
 # Sets up all environment vars.
 
-################### USER_ORG_SERVICE configuration ###################################
-#export keyA=valA
+################### GROUPS_SERVICE configuration ###################################
+#sunbird_cassandra_consistency_level='quorum'
+#sunbird_cassandra_host=''
+#sunbird_cassandra_password=''
+#sunbird_cassandra_port='9042'
+#sunbird_cassandra_username='cassandra'
 
-################### END - USER_ORG_SERVICE configuration #############################
+#LEARNER_SERVICE_PORT=''
+
+#sunbird_redis_host=''
+#sunbird_redis_port=''
+
+#CONTENT_SERVICE_PORT=''
+
+#ADMINUTIL_PORT=''
+#sunbird_sso_client_id=''
+#sunbird_sso_client_secret=''
+#sunbird_sso_publickey=''
+#sunbird_sso_realm='sunbird'
+#sunbird_sso_url=''
+
+#admin util keys must be injected
+
+################### END - GROUPS_SERVICE configuration #############################
