@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.dao.MemberDao;
@@ -48,7 +52,7 @@ public class MemberServiceImpl implements MemberService {
   }
 
   @Override
-  public Response removeMembers(List<Member> member, String groupId) throws BaseException {
+  public Response removeMembers(List<Member> member) throws BaseException {
     member.forEach(m -> m.setStatus(JsonKey.INACTIVE));
     member.forEach(m -> m.setRemovedBy(""));//TODO - take from request
     member.forEach(m -> m.setRemovedOn(new Timestamp(System.currentTimeMillis())));
@@ -59,36 +63,32 @@ public class MemberServiceImpl implements MemberService {
   public void handleMemberOperations(Map memberOperationMap, String groupId) throws BaseException{
     if (memberOperationMap!=null && !memberOperationMap.isEmpty()) {
       List<Map<String, Object>> memberAddList = (List<Map<String, Object>>)memberOperationMap.get(JsonKey.MEMBER_ADD);
-      List<Map<String, Object>> memberEditList = (List<Map<String, Object>>)memberOperationMap.get(JsonKey.MEMBER_EDIT);
-      List<String> memberRemoveList = (List<String>)memberOperationMap.get(JsonKey.MEMBER_REMOVE);
-      if(memberAddList!=null && !memberAddList.isEmpty()) {
-        List<Member> addMembers =
-                memberAddList
-                        .stream()
-                        .map(data -> getMemberModel(data, groupId))
-                        .collect(Collectors.toList());
-        if (!addMembers.isEmpty()) {
-          Response addMemberRes = addMembers(addMembers);
-        }
+      if(CollectionUtils.isNotEmpty(memberAddList)) {
+        Response addMemberRes = handleMemberAddition(memberAddList, groupId);
+
       }
-      if(memberEditList!=null && !memberEditList.isEmpty()) {
+      List<Map<String, Object>> memberEditList = (List<Map<String, Object>>)memberOperationMap.get(JsonKey.MEMBER_EDIT);
+      if(CollectionUtils.isNotEmpty(memberEditList)) {
         List<Member> editMembers =
                 memberEditList
                         .stream()
                         .map(data -> getMemberModel(data, groupId))
                         .collect(Collectors.toList());
         if (!editMembers.isEmpty()) {
-          Response addMemberRes = editMembers(editMembers);
+          Response editMemberRes = editMembers(editMembers);
+
         }
       }
-      if(memberRemoveList!=null && !memberRemoveList.isEmpty()) {
+      List<String> memberRemoveList = (List<String>)memberOperationMap.get(JsonKey.MEMBER_REMOVE);
+      if(CollectionUtils.isNotEmpty(memberRemoveList)) {
         List<Member> removeMembers =
                 memberRemoveList
                         .stream()
                         .map(data -> getMemberModelForRemove(data, groupId))
                         .collect(Collectors.toList());
         if (!removeMembers.isEmpty()) {
-          Response addMemberRes = removeMembers(removeMembers, groupId);
+          Response removeMemberRes = removeMembers(removeMembers);
+
         }
       }
     }
@@ -130,7 +130,12 @@ public class MemberServiceImpl implements MemberService {
   private Member getMemberModel(Map<String, Object> data, String groupId) {
     Member member = new Member();
     member.setGroupId(groupId);
-    member.setRole((String) data.get(JsonKey.ROLE));
+    String role = (String) data.get(JsonKey.ROLE);
+    if(StringUtils.isNotEmpty(role)){
+      member.setRole(role);
+    }else{
+      member.setRole(JsonKey.MEMBER);
+    }
     member.setUserId((String) data.get(JsonKey.USER_ID));
     return member;
   }

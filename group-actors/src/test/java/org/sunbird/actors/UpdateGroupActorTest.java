@@ -23,6 +23,10 @@ import org.sunbird.response.Response;
 import org.sunbird.util.JsonKey;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -75,13 +79,32 @@ public class UpdateGroupActorTest extends BaseActorTest {
     reqObj.setHeaders(headerMap);
     reqObj.setOperation(ActorOperations.UPDATE_GROUP.getValue());
     reqObj.getRequest().put(JsonKey.GROUP_NAME, "TestGroup Name1");
-    /*List<Map<String, Object>> members = new ArrayList<>();
+    Map<String,List<Map<String, Object>>> memberOpearations = new HashMap<>();
+
+    List<Map<String, Object>> members = new ArrayList<>();
     Map<String, Object> member = new HashMap<>();
-    member.put(JsonKey.USER_ID, "userID");
+    member.put(JsonKey.USER_ID, "userID1");
     member.put(JsonKey.STATUS, "active");
     member.put(JsonKey.ROLE, "member");
     members.add(member);
-    reqObj.getRequest().put(JsonKey.MEMBERS, members);*/
+    member = new HashMap<>();
+    member.put(JsonKey.USER_ID, "userID2");
+    member.put(JsonKey.STATUS, "active");
+    member.put(JsonKey.ROLE, "member");
+    members.add(member);
+    memberOpearations.put("add",members);
+    //Edit
+    members = new ArrayList<>();
+    member = new HashMap<>();
+    member.put(JsonKey.USER_ID, "userID1");
+    member.put(JsonKey.ROLE, "admin");
+    members.add(member);
+    memberOpearations.put("edit",members);
+    //Remove
+    ArrayList removeMembers = new ArrayList();
+    removeMembers.add("userID1");
+    memberOpearations.put("remove",removeMembers);
+    reqObj.getRequest().put(JsonKey.MEMBERS, memberOpearations);
     reqObj.getRequest().put(JsonKey.ID, "group1");
     return reqObj;
   }

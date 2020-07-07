@@ -12,7 +12,7 @@ public interface MemberService {
 
   Response editMembers(List<Member> member) throws BaseException;
 
-  Response removeMembers(List<Member> member, String groupId) throws BaseException;
+  Response removeMembers(List<Member> member) throws BaseException;
 
   public void handleMemberOperations(Map memberOperationMap, String groupId) throws BaseException;
 
