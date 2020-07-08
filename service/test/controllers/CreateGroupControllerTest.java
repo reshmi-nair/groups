@@ -32,6 +32,12 @@ public class CreateGroupControllerTest extends BaseApplicationTest {
     member.put(JsonKey.USER_ID, "userID");
     members.add(member);
     reqMap.put(JsonKey.MEMBERS, members);
+    List<Map<String, Object>> activities = new ArrayList<>();
+    Map<String, Object> activity = new HashMap<>();
+    activity.put(JsonKey.TYPE, "COURSE");
+    activity.put(JsonKey.ID, "courseId");
+    activities.add(activity);
+    reqMap.put(JsonKey.ACTIVITIES, activities);
     request.put("request", reqMap);
     Result result = performTest("/v1/group/create", "POST", request);
     assertTrue(getResponseStatus(result) == Response.Status.OK.getStatusCode());

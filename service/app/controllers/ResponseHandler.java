@@ -4,6 +4,7 @@ import org.apache.http.HttpStatus;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.response.ResponseFactory;
+import org.sunbird.util.JsonKey;
 import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.Results;
@@ -46,12 +47,16 @@ public class ResponseHandler {
    */
   public static Result handleResponse(Object object, Request request) {
     if (object instanceof Response) {
-      return handleSuccessResponse((Response) object);
+      return handleSuccessResponse((Response) object, request);
     }
     return handleFailureResponse(object, request);
   }
 
-  private static Result handleSuccessResponse(Response response) {
+  private static Result handleSuccessResponse(Response response, Request request) {
+    String apiId = ResponseFactory.getApiId(request.getPath());
+    response.setId(apiId);
+    response.setVer(JsonKey.API_VERSION);
+    response.setTs(ResponseFactory.getCurrentDate());
     return Results.ok(Json.toJson(response));
   }
 }

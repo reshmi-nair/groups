@@ -21,4 +21,14 @@ public enum ResponseCode {
   public int getCode() {
     return this.code;
   }
+
+  public static ResponseCode getResponseCode(int code) {
+    ResponseCode[] codes = ResponseCode.values();
+    for (ResponseCode res : codes) {
+      if (res.code == code) {
+        return res;
+      }
+    }
+    return ResponseCode.RESOURCE_NOT_FOUND;
+  }
 }
