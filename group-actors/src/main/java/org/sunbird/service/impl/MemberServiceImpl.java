@@ -36,26 +36,32 @@ public class MemberServiceImpl implements MemberService {
 
   @Override
   public Response addMembers(List<Member> member) throws BaseException {
-    member.forEach(m -> m.setStatus(JsonKey.ACTIVE));
-    member.forEach(m -> m.setCreatedBy(""));//TODO - take from request
-    member.forEach(m -> m.setCreatedOn(new Timestamp(System.currentTimeMillis())));
+    member.forEach(m -> {
+      m.setStatus(JsonKey.ACTIVE);
+      m.setCreatedBy("");//TODO - take from request
+      m.setCreatedOn(new Timestamp(System.currentTimeMillis()));}
+    );
     Response response = memberDao.addMembers(member);
     return response;
   }
 
   @Override
   public Response editMembers(List<Member> member) throws BaseException {
-    member.forEach(m -> m.setUpdatedBy(""));//TODO - take from request
-    member.forEach(m -> m.setUpdatedOn(new Timestamp(System.currentTimeMillis())));
+    member.forEach(m -> {
+      m.setUpdatedBy("");//TODO - take from request
+      m.setUpdatedOn(new Timestamp(System.currentTimeMillis()));
+    });
     Response response = memberDao.editMembers(member);
     return response;
   }
 
   @Override
   public Response removeMembers(List<Member> member) throws BaseException {
-    member.forEach(m -> m.setStatus(JsonKey.INACTIVE));
-    member.forEach(m -> m.setRemovedBy(""));//TODO - take from request
-    member.forEach(m -> m.setRemovedOn(new Timestamp(System.currentTimeMillis())));
+    member.forEach(m -> {
+      m.setStatus(JsonKey.INACTIVE);
+      m.setRemovedBy("");//TODO - take from request
+      m.setRemovedOn(new Timestamp(System.currentTimeMillis()));
+  });
     Response response = memberDao.editMembers(member);
     return response;
   }
