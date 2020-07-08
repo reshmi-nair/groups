@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.sunbird.models.GroupResponse;
-import org.sunbird.models.Member;
+import org.sunbird.models.MemberResponse;
 
 public class GroupUtil {
 
@@ -15,7 +15,8 @@ public class GroupUtil {
    * @param members
    * @param userId
    */
-  public static void updateRoles(List<GroupResponse> groups, List<Member> members, String userId) {
+  public static void updateRoles(
+      List<GroupResponse> groups, List<MemberResponse> members, String userId) {
     if (!groups.isEmpty()) {
       Map<String, String> groupRoleMap = getGroupRoleOfUser(members, userId);
       for (GroupResponse group : groups) {
@@ -31,7 +32,8 @@ public class GroupUtil {
    * @param userId
    * @return groupRoleMap
    */
-  private static Map<String, String> getGroupRoleOfUser(List<Member> members, String userId) {
+  private static Map<String, String> getGroupRoleOfUser(
+      List<MemberResponse> members, String userId) {
     Map<String, String> groupRoleMap = new HashMap<>();
     members.forEach(
         map -> {
