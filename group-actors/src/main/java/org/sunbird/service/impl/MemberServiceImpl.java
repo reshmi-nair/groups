@@ -12,6 +12,7 @@ import org.sunbird.dao.MemberDao;
 import org.sunbird.dao.impl.MemberDaoImpl;
 import org.sunbird.exception.BaseException;
 import org.sunbird.models.Member;
+import org.sunbird.models.MemberResponse;
 import org.sunbird.response.Response;
 import org.sunbird.service.MemberService;
 import org.sunbird.util.JsonKey;
@@ -54,18 +55,28 @@ public class MemberServiceImpl implements MemberService {
     return addMemberRes;
   }
 
+  // TODO: Fix me to get the Members Details with List<Member> includes username
+
+  /**
+   * Fetch Member Details based on Group
+   *
+   * @param groupIds
+   * @param fields
+   * @return
+   * @throws BaseException
+   */
   @Override
-  public List<Member> fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
+  public List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
       throws BaseException {
     Response response = memberDao.fetchMembersByGroupIds(groupIds, fields);
-    List<Member> members = new ArrayList<>();
+    List<MemberResponse> members = new ArrayList<>();
     if (null != response && null != response.getResult()) {
       List<Map<String, Object>> dbResMembers =
           (List<Map<String, Object>>) response.getResult().get(JsonKey.RESPONSE);
       if (null != dbResMembers) {
         dbResMembers.forEach(
             map -> {
-              Member member = objectMapper.convertValue(map, Member.class);
+              MemberResponse member = objectMapper.convertValue(map, MemberResponse.class);
               members.add(member);
             });
       }

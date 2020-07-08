@@ -1,8 +1,12 @@
 package org.sunbird.actors;
 
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
+import java.time.Duration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,14 +24,7 @@ import org.sunbird.message.Localizer;
 import org.sunbird.models.ActorOperations;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
-import org.sunbird.service.GroupService;
-import org.sunbird.service.impl.GroupServiceImpl;
 import org.sunbird.util.JsonKey;
-
-import java.time.Duration;
-
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Localizer.class, ServiceFactory.class})
@@ -57,13 +54,14 @@ public class ReadGroupActorTest extends BaseActorTest {
     try {
       when(cassandraOperation.getRecordById(
               Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-              .thenReturn(getCassandraResponse());
+          .thenReturn(getCassandraResponse());
     } catch (BaseException be) {
       Assert.assertTrue(false);
     }
-      subject.tell(reqObj, probe.getRef());
-      Response res = probe.expectMsgClass(Duration.ofSeconds(10), Response.class);
-      Assert.assertTrue(null != res && res.getResponseCode() == 200);
-
+    subject.tell(reqObj, probe.getRef());
+    Response res = probe.expectMsgClass(Duration.ofSeconds(10), Response.class);
+    Assert.assertTrue(null != res && res.getResponseCode() == 200);
   }
+
+  // TODO: Test Case needs to be added for add members during read.
 }

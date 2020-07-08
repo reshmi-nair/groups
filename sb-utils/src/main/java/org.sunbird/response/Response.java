@@ -35,6 +35,10 @@ public class Response implements Serializable, Cloneable {
     this.result = result;
     this.code = code;
   }
+
+  public Response(int code) {
+    this.code = code;
+  }
   /**
    * This will provide request unique id.
    *

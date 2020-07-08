@@ -48,6 +48,7 @@ public class CreateGroupActor extends BaseActor {
     Group group = new Group();
     group.setName((String) actorMessage.getRequest().get(JsonKey.GROUP_NAME));
     group.setDescription((String) actorMessage.getRequest().get(JsonKey.GROUP_DESC));
+    group.setStatus(JsonKey.ACTIVE);
     String groupId = groupService.createGroup(group);
 
     // adding members to group
