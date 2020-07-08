@@ -45,7 +45,6 @@ public class CreateGroupActor extends BaseActor {
 
     GroupRequestHandler requestHandler = new GroupRequestHandler();
     Group group = requestHandler.handleCreateGroupRequest(actorMessage);
-
     String groupId = groupService.createGroup(group);
 
     // adding members to group

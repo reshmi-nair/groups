@@ -16,5 +16,4 @@ public interface GroupService {
   List<GroupResponse> searchGroup(Map<String, Object> searchFilter) throws BaseException;
 
   Response updateGroup(Group groupObj) throws BaseException;
-
 }
