@@ -2,7 +2,9 @@ package org.sunbird.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+
 import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,6 @@ public class GroupServiceImpl implements GroupService {
 
   @Override
   public String createGroup(Group groupObj) throws BaseException {
-    groupObj.setId(UUID.randomUUID().toString());
     String groupId = groupDao.createGroup(groupObj);
     return groupId;
   }
@@ -138,5 +139,11 @@ public class GroupServiceImpl implements GroupService {
       }
     }
     return groups;
+  }
+
+  @Override
+  public Response updateGroup(Group groupObj) throws BaseException {
+    Response responseObj = groupDao.updateGroup(groupObj);
+    return responseObj;
   }
 }

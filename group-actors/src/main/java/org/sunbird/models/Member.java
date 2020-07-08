@@ -1,15 +1,24 @@
 package org.sunbird.models;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.StringUtils;
+import org.sunbird.cassandraannotation.PartitioningKey;
 import org.sunbird.util.JsonKey;
 
-public class Member {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Member implements Serializable {
 
-  private String userId;
-  private String role = JsonKey.MEMBER;
-  private String groupId;
-  private String status = JsonKey.ACTIVE;
+  private static final long serialVersionUID = 7529802960267784945L;
+
+  @PartitioningKey() private String userId;
+  @PartitioningKey() private String groupId;
+  private String role;
+  private String status;
   private Timestamp createdOn;
   private String createdBy;
   private Timestamp updatedOn;

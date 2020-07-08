@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.response.Response;
 import org.sunbird.util.JsonKey;
 
@@ -36,6 +37,7 @@ public abstract class BaseActorTest {
 
   public static Response getCassandraResponse() {
     Response response = new Response();
+    response.setResponseCode(ResponseCode.OK.getCode());
     return response;
   }
 }

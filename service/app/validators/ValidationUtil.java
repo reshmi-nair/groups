@@ -62,11 +62,6 @@ public class ValidationUtil {
       }
     }
   }
-
-  private static boolean isInstanceOf(Class objClass, Class targetClass) {
-    return targetClass.isAssignableFrom(objClass);
-  }
-
   /**
    * @param reqMap
    * @param params list of params to validate values it contains
@@ -76,8 +71,8 @@ public class ValidationUtil {
    * @throws BaseException
    */
   public static void validateParamValue(
-      Map<String, Object> reqMap, List<String> params, Map<String, List<String>> paramsValue)
-      throws BaseException {
+          Map<String, Object> reqMap, List<String> params, Map<String, List<String>> paramsValue)
+          throws BaseException {
     logger.info("validating Param Value for the params {} values {}", params, paramsValue);
     for (String param : params) {
       logger.info(" paramsValue.get(param) {}", paramsValue.get(param));
@@ -90,4 +85,8 @@ public class ValidationUtil {
       }
     }
   }
+  private static boolean isInstanceOf(Class objClass, Class targetClass) {
+    return targetClass.isAssignableFrom(objClass);
+  }
+
 }
