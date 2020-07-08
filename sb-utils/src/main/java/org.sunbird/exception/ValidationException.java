@@ -20,12 +20,13 @@ public class ValidationException {
   }
 
   public static class MandatoryParamMissing extends BaseException {
-    public MandatoryParamMissing(String param) {
+    public MandatoryParamMissing(String param, String parentKey) {
       super(
           IResponseMessage.INVALID_REQUESTED_DATA,
           MessageFormat.format(
               ValidationException.getLocalizedMessage(
                   IResponseMessage.MISSING_MANDATORY_PARAMS, null),
+              parentKey,
               param),
           400);
     }

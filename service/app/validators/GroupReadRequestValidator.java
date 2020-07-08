@@ -18,7 +18,11 @@ public class GroupReadRequestValidator implements IRequestValidator {
             + request.getRequest());
     ValidationUtil.validateRequestObject(request);
     ValidationUtil.validateMandatoryParamsWithType(
-        request, Lists.newArrayList(JsonKey.GROUP_ID), String.class, true);
+        request.getRequest(),
+        Lists.newArrayList(JsonKey.GROUP_ID),
+        String.class,
+        true,
+        JsonKey.REQUEST);
     return true;
   }
 }

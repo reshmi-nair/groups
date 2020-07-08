@@ -19,7 +19,11 @@ public class GroupSearchRequestValidator implements validators.IRequestValidator
             + request.getRequest());
     validators.ValidationUtil.validateRequestObject(request);
     validators.ValidationUtil.validateMandatoryParamsWithType(
-        request, Lists.newArrayList(JsonKey.FILTERS), Map.class, false);
+        request.getRequest(),
+        Lists.newArrayList(JsonKey.FILTERS),
+        Map.class,
+        false,
+        JsonKey.REQUEST);
     return true;
   }
 }

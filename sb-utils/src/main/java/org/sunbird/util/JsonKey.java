@@ -58,4 +58,9 @@ public interface JsonKey {
   String MEMBER_REMOVE = "remove";
   String INVITE_ONLY = "invite_only";
   String MODERATED = "moderated";
+  String ACTIVITIES = "activities";
+  String TYPE = "type";
+  String REQUEST = "request";
+  String CREATED_ON = "createdOn";
+  String UPDATED_ON = "updatedOn";
 }

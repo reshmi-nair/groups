@@ -2,9 +2,11 @@ package org.sunbird.dao.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.*;
-
 import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.dao.GroupDao;
 import org.sunbird.exception.BaseException;
@@ -34,8 +36,10 @@ public class GroupDaoImpl implements GroupDao {
   public String createGroup(Group groupObj) throws BaseException {
 
     Map<String, Object> map =
-            mapper.convertValue(groupObj, new TypeReference<Map<String, Object>>() {});
-    map.put("createdOn",new Timestamp(Calendar.getInstance().getTime().getTime()));
+        mapper.convertValue(groupObj, new TypeReference<Map<String, Object>>() {});
+    map.put(JsonKey.CREATED_ON, new Timestamp(Calendar.getInstance().getTime().getTime()));
+    // need to fix , as mapper is converting set to arrayList
+    map.put(JsonKey.ACTIVITIES, groupObj.getActivities());
     cassandraOperation.insertRecord(DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, map);
     return (String) map.get(JsonKey.ID);
   }
@@ -69,8 +73,9 @@ public class GroupDaoImpl implements GroupDao {
   @Override
   public Response updateGroup(Group groupObj) throws BaseException {
     Map<String, Object> map = mapper.convertValue(groupObj, Map.class);
-    map.put("updatedOn",new Timestamp(Calendar.getInstance().getTime().getTime()));
-    Response responseObj = cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, map);
+    map.put(JsonKey.UPDATED_ON, new Timestamp(Calendar.getInstance().getTime().getTime()));
+    Response responseObj =
+        cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, map);
     return responseObj;
   }
 }

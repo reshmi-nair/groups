@@ -5,11 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.exception.BaseException;
-import org.sunbird.exception.ValidationException;
 import org.sunbird.request.Request;
 import org.sunbird.util.JsonKey;
 
@@ -24,9 +22,14 @@ public class GroupCreateRequestValidator implements IRequestValidator {
             + request.getRequest());
     ValidationUtil.validateRequestObject(request);
     ValidationUtil.validateMandatoryParamsWithType(
-        request, Lists.newArrayList(JsonKey.GROUP_NAME), String.class, true);
+        request.getRequest(),
+        Lists.newArrayList(JsonKey.GROUP_NAME),
+        String.class,
+        true,
+        JsonKey.REQUEST);
     // validate value of status and role of members and userId if provided in request
     validateRoleAndStatus(request);
+    validateActivityList(request);
     return true;
   }
 
@@ -44,12 +47,38 @@ public class GroupCreateRequestValidator implements IRequestValidator {
         (List<Map<String, Object>>) request.getRequest().get(JsonKey.MEMBERS);
     if (CollectionUtils.isNotEmpty(memberList)) {
       for (Map<String, Object> member : memberList) {
-        if (StringUtils.isBlank((String) member.get(JsonKey.USER_ID))) {
-          throw new ValidationException.MandatoryParamMissing(
-              JsonKey.MEMBERS + "[" + memberList.indexOf(member) + "]." + JsonKey.USER_ID);
-        }
+        ValidationUtil.validateMandatoryParamsWithType(
+            member,
+            Lists.newArrayList(JsonKey.USER_ID),
+            String.class,
+            true,
+            JsonKey.MEMBERS + "[" + memberList.indexOf(member) + "]");
         ValidationUtil.validateParamValue(
-            member, Lists.newArrayList(JsonKey.STATUS, JsonKey.ROLE), paramValue);
+            member,
+            Lists.newArrayList(JsonKey.STATUS, JsonKey.ROLE),
+            paramValue,
+            JsonKey.MEMBERS + "[" + memberList.indexOf(member) + "]");
+      }
+    }
+  }
+
+  /**
+   * checks mandatory param id and type of activity
+   *
+   * @param request
+   * @throws BaseException
+   */
+  private void validateActivityList(Request request) throws BaseException {
+    List<Map<String, Object>> activityList =
+        (List<Map<String, Object>>) request.getRequest().get(JsonKey.ACTIVITIES);
+    if (CollectionUtils.isNotEmpty(activityList)) {
+      for (Map<String, Object> activity : activityList) {
+        ValidationUtil.validateMandatoryParamsWithType(
+            activity,
+            Lists.newArrayList(JsonKey.ID, JsonKey.TYPE),
+            String.class,
+            true,
+            JsonKey.ACTIVITIES + "[" + activityList.indexOf(activity) + "]");
       }
     }
   }
