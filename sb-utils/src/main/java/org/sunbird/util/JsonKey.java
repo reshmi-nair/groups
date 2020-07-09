@@ -1,5 +1,8 @@
 package org.sunbird.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 /** This interface will contains all the constants that's used throughout this application. */
 public interface JsonKey {
 
@@ -52,6 +55,39 @@ public interface JsonKey {
   String API_ACCESS = "api_access";
   String FILTERS = "filters";
   String GROUP = "group";
+  String UNAUTHORIZED = "Unauthorized";
+  String MANAGED_FOR = "managedFor";
+  String SUNBIRD_SSO_CLIENT_ID = "sunbird_sso_client_id";
+  String SUNBIRD_SSO_CLIENT_SECRET = "sunbird_sso_client_secret";
+  String SUNBIRD_SSO_PASSWORD = "sunbird_sso_password";
+  String SUNBIRD_SSO_RELAM = "sunbird_sso_realm";
+  String SUNBIRD_SSO_URL = "sunbird_sso_url";
+  String SUNBIRD_SSO_USERNAME = "sunbird_sso_username";
+  String SSO_CLIENT_ID = "sso.client.id";
+  String SSO_CLIENT_SECRET = "sso.client.secret";
+  String SSO_PASSWORD = "sso.password";
+  String SSO_POOL_SIZE = "sso.connection.pool.size";
+  String SSO_PUBLIC_KEY = "sunbird_sso_publickey";
+  String SSO_REALM = "sso.realm";
+  String SSO_URL = "sso.url";
+  String SSO_USERNAME = "sso.username";
+  String MESSAGE_ID = "X-msgId";
+  String ANONYMOUS = "Anonymous";
+  List<String> USER_UNAUTH_STATES =
+    Arrays.asList(JsonKey.UNAUTHORIZED, JsonKey.ANONYMOUS);
+  String IS_AUTH_REQ = "isAuthReq";
+  String REQUEST = "request";
+  String IS_SSO_ENABLED = "sso.enabled";
+  String PARENT_ID = "parentId";
+  String SUB = "sub";
+  String DOT_SEPARATOR = ".";
+  String SHA_256_WITH_RSA = "SHA256withRSA";
+  String REQUEST_ID = "requestId";
+  String VERSION_2 = "v2";
+  String ACCESS_TOKEN_PUBLICKEY_BASEPATH = "accesstoken.publickey.basepath";
+  String ACCESS_TOKEN_PUBLICKEY_KEYPREFIX = "accesstoken.publickey.keyprefix";
+  String ACCESS_TOKEN_PUBLICKEY_KEYCOUNT = "accesstoken.publickey.keycount";
+  
   String MEMBER_ROLE = "memberRole";
   String MEMBER_ADD = "add";
   String MEMBER_EDIT = "edit";
@@ -60,7 +96,6 @@ public interface JsonKey {
   String MODERATED = "moderated";
   String ACTIVITIES = "activities";
   String TYPE = "type";
-  String REQUEST = "request";
   String CREATED_ON = "createdOn";
   String UPDATED_ON = "updatedOn";
 }

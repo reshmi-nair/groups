@@ -14,6 +14,7 @@ import org.sunbird.common.Constants;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
+import org.sunbird.util.helper.PropertiesCache;
 
 public class CassandraConnectionManagerImpl implements CassandraConnectionManager {
   private static Cluster cluster;

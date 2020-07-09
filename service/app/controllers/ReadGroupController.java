@@ -6,7 +6,6 @@ import org.sunbird.request.Request;
 import org.sunbird.util.JsonKey;
 import play.mvc.Http;
 import play.mvc.Result;
-import validators.GroupCreateRequestValidator;
 import validators.GroupReadRequestValidator;
 import validators.IRequestValidator;
 
