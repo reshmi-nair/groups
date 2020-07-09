@@ -39,79 +39,65 @@ public class MemberServiceImpl implements MemberService {
 
   @Override
   public Response addMembers(List<Member> member) throws BaseException {
-    member.forEach(
-        m -> {
-          m.setStatus(JsonKey.ACTIVE);
-          m.setCreatedBy(""); // TODO - take from request
-          m.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-        });
     Response response = memberDao.addMembers(member);
     return response;
   }
 
   @Override
   public Response editMembers(List<Member> member) throws BaseException {
-    member.forEach(
-        m -> {
-          m.setUpdatedBy(""); // TODO - take from request
-          m.setUpdatedOn(new Timestamp(System.currentTimeMillis()));
-        });
     Response response = memberDao.editMembers(member);
     return response;
   }
 
   @Override
   public Response removeMembers(List<Member> member) throws BaseException {
-    member.forEach(
-        m -> {
-          m.setStatus(JsonKey.INACTIVE);
-          m.setRemovedBy(""); // TODO - take from request
-          m.setRemovedOn(new Timestamp(System.currentTimeMillis()));
-        });
     Response response = memberDao.editMembers(member);
     return response;
   }
 
-  public void handleMemberOperations(Map memberOperationMap, String groupId) throws BaseException {
-    if (memberOperationMap != null && !memberOperationMap.isEmpty()) {
-      List<Map<String, Object>> memberAddList =
-          (List<Map<String, Object>>) memberOperationMap.get(JsonKey.MEMBER_ADD);
-      if (CollectionUtils.isNotEmpty(memberAddList)) {
-        Response addMemberRes = handleMemberAddition(memberAddList, groupId);
+  public void handleMemberOperations(Map memberOperationMap, String groupId, String contextUserId)
+      throws BaseException {
+    List<Map<String, Object>> memberAddList =
+        (List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD);
+    if (CollectionUtils.isNotEmpty(memberAddList)) {
+      Response addMemberRes = handleMemberAddition(memberAddList, groupId, contextUserId);
+    }
+    List<Map<String, Object>> memberEditList =
+        (List<Map<String, Object>>) memberOperationMap.get(JsonKey.EDIT);
+    if (CollectionUtils.isNotEmpty(memberEditList)) {
+      List<Member> editMembers =
+          memberEditList
+              .stream()
+              .map(data -> getMemberModelForEdit(data, groupId, contextUserId))
+              .collect(Collectors.toList());
+      if (!editMembers.isEmpty()) {
+        Response editMemberRes = editMembers(editMembers);
       }
-      List<Map<String, Object>> memberEditList =
-          (List<Map<String, Object>>) memberOperationMap.get(JsonKey.MEMBER_EDIT);
-      if (CollectionUtils.isNotEmpty(memberEditList)) {
-        List<Member> editMembers =
-            memberEditList
-                .stream()
-                .map(data -> getMemberModel(data, groupId))
-                .collect(Collectors.toList());
-        if (!editMembers.isEmpty()) {
-          Response editMemberRes = editMembers(editMembers);
-        }
-      }
-      List<String> memberRemoveList = (List<String>) memberOperationMap.get(JsonKey.MEMBER_REMOVE);
-      if (CollectionUtils.isNotEmpty(memberRemoveList)) {
-        List<Member> removeMembers =
-            memberRemoveList
-                .stream()
-                .map(data -> getMemberModelForRemove(data, groupId))
-                .collect(Collectors.toList());
-        if (!removeMembers.isEmpty()) {
-          Response removeMemberRes = removeMembers(removeMembers);
-        }
+    }
+    List<String> memberRemoveList = (List<String>) memberOperationMap.get(JsonKey.REMOVE);
+    if (CollectionUtils.isNotEmpty(memberRemoveList)) {
+      List<Member> removeMembers =
+          memberRemoveList
+              .stream()
+              .map(data -> getMemberModelForRemove(data, groupId, contextUserId))
+              .collect(Collectors.toList());
+      if (!removeMembers.isEmpty()) {
+        Response removeMemberRes = removeMembers(removeMembers);
       }
     }
   }
 
   @Override
-  public Response handleMemberAddition(List<Map<String, Object>> memberList, String groupId)
+  public Response handleMemberAddition(
+      List<Map<String, Object>> memberList, String groupId, String contextUserId)
       throws BaseException {
     logger.info("Number of members to be added are: {}", memberList.size());
     Response addMemberRes = new Response();
     List<Member> members =
-        memberList.stream().map(data -> getMemberModel(data, groupId)).collect(Collectors.toList());
+        memberList
+            .stream()
+            .map(data -> getMemberModelForAdd(data, groupId, contextUserId))
+            .collect(Collectors.toList());
     if (!members.isEmpty()) {
       addMemberRes = addMembers(members);
     }
@@ -199,7 +185,8 @@ public class MemberServiceImpl implements MemberService {
     return groupRoleMap;
   }
 
-  private Member getMemberModel(Map<String, Object> data, String groupId) {
+  private Member getMemberModelForAdd(
+      Map<String, Object> data, String groupId, String contextUserId) {
     Member member = new Member();
     member.setGroupId(groupId);
     String role = (String) data.get(JsonKey.ROLE);
@@ -209,13 +196,38 @@ public class MemberServiceImpl implements MemberService {
       member.setRole(JsonKey.MEMBER);
     }
     member.setUserId((String) data.get(JsonKey.USER_ID));
+    member.setStatus(JsonKey.ACTIVE);
+    member.setCreatedBy(contextUserId);
+    member.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+
     return member;
   }
 
-  private Member getMemberModelForRemove(String userId, String groupId) {
+  private Member getMemberModelForEdit(
+      Map<String, Object> data, String groupId, String contextUserId) {
     Member member = new Member();
-    member.setUserId(userId);
     member.setGroupId(groupId);
+    String role = (String) data.get(JsonKey.ROLE);
+    if (StringUtils.isNotEmpty(role)) {
+      member.setRole(role);
+    } else {
+      member.setRole(JsonKey.MEMBER);
+    }
+    member.setUserId((String) data.get(JsonKey.USER_ID));
+    member.setUpdatedBy(contextUserId);
+    member.setUpdatedOn(new Timestamp(System.currentTimeMillis()));
+
+    return member;
+  }
+
+  private Member getMemberModelForRemove(String userId, String groupId, String contextUserId) {
+    Member member = new Member();
+    member.setGroupId(groupId);
+    member.setUserId(userId);
+    member.setStatus(JsonKey.INACTIVE);
+    member.setRemovedBy(contextUserId);
+    member.setRemovedOn(new Timestamp(System.currentTimeMillis()));
+
     return member;
   }
 

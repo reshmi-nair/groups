@@ -26,7 +26,7 @@ public class GroupRequestHandler {
       group.setMembershipType(JsonKey.INVITE_ONLY);
     }
     group.setStatus(JsonKey.ACTIVE);
-    group.setCreatedBy(""); // TODO - add from request context
+    group.setCreatedBy((String) actorMessage.getContext().get(JsonKey.USER_ID));
     group.setId(UUID.randomUUID().toString());
     List<Map<String, Object>> activityList =
         (List<Map<String, Object>>) actorMessage.getRequest().get(JsonKey.ACTIVITIES);
@@ -47,7 +47,8 @@ public class GroupRequestHandler {
     if (StringUtils.isNotEmpty(status) && status.equalsIgnoreCase(JsonKey.INACTIVE)) {
       group.setStatus(status);
     }
-    group.setUpdatedBy(""); // TODO - add from request context
+    group.setUpdatedBy((String) actorMessage.getContext().get(JsonKey.USER_ID));
+
     return group;
   }
 }

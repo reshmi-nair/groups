@@ -1,5 +1,7 @@
 package org.sunbird.actors;
 
+import java.util.Map;
+import org.apache.commons.collections4.MapUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.ResponseCode;
@@ -13,47 +15,52 @@ import org.sunbird.service.impl.MemberServiceImpl;
 import org.sunbird.util.GroupRequestHandler;
 import org.sunbird.util.JsonKey;
 
-import java.util.Map;
-
 @ActorConfig(
-        tasks = {"updateGroup"},
-        asyncTasks = {}
+  tasks = {"updateGroup"},
+  asyncTasks = {}
 )
 public class UpdateGroupActor extends BaseActor {
-    private GroupService groupService = GroupServiceImpl.getInstance();
-    private MemberService memberService = MemberServiceImpl.getInstance();
+  private GroupService groupService = GroupServiceImpl.getInstance();
+  private MemberService memberService = MemberServiceImpl.getInstance();
 
-    @Override
-    public void onReceive(Request request) throws Throwable {
-        String operation = request.getOperation();
-        switch (operation) {
-            case "updateGroup":
-                updateGroup(request);
-                break;
-            default:
-                onReceiveUnsupportedMessage("UpdateGroupActor");
-        }
+  @Override
+  public void onReceive(Request request) throws Throwable {
+    String operation = request.getOperation();
+    switch (operation) {
+      case "updateGroup":
+        updateGroup(request);
+        break;
+      default:
+        onReceiveUnsupportedMessage("UpdateGroupActor");
     }
-    /**
-     * This method will update group in cassandra based on group id.
-     *
-     * @param actorMessage
-     */
-    private void updateGroup(Request actorMessage) throws BaseException {
-        logger.info("UpdateGroup method call");
-        GroupRequestHandler requestHandler = new GroupRequestHandler();
-        Group group = requestHandler.handleUpdateGroupRequest(actorMessage);
+  }
+  /**
+   * This method will update group in cassandra based on group id.
+   *
+   * @param actorMessage
+   */
+  private void updateGroup(Request actorMessage) throws BaseException {
+    logger.info("UpdateGroup method call");
+    GroupRequestHandler requestHandler = new GroupRequestHandler();
+    Group group = requestHandler.handleUpdateGroupRequest(actorMessage);
 
-        // member operations to group
-        Map memberOperationMap =
-                (Map) actorMessage.getRequest().get(JsonKey.MEMBERS);
-        memberService.handleMemberOperations(memberOperationMap, group.getId());
-
-        Response response = groupService.updateGroup(group);
-        response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
-        response.setResponseCode(ResponseCode.OK.getCode());
-        sender().tell(response, self());
+    // member operations to group
+    Map memberOperationMap = (Map) actorMessage.getRequest().get(JsonKey.MEMBERS);
+    if (MapUtils.isNotEmpty(memberOperationMap)) {
+      memberService.handleMemberOperations(
+          memberOperationMap,
+          group.getId(),
+          (String) actorMessage.getContext().get(JsonKey.USER_ID));
     }
 
-
+    // activity operations to group
+    Map activityOperationMap = (Map) actorMessage.getRequest().get(JsonKey.ACTIVITIES);
+    if (MapUtils.isNotEmpty(activityOperationMap)) {
+      groupService.handleActivityOperations(group.getId(), activityOperationMap);
+    }
+    Response response = groupService.updateGroup(group);
+    response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
+    response.setResponseCode(ResponseCode.OK.getCode());
+    sender().tell(response, self());
+  }
 }

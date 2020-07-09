@@ -87,9 +87,9 @@ public interface JsonKey {
   String ACCESS_TOKEN_PUBLICKEY_KEYPREFIX = "accesstoken.publickey.keyprefix";
   String ACCESS_TOKEN_PUBLICKEY_KEYCOUNT = "accesstoken.publickey.keycount";
   String MEMBER_ROLE = "memberRole";
-  String MEMBER_ADD = "add";
-  String MEMBER_EDIT = "edit";
-  String MEMBER_REMOVE = "remove";
+  String ADD = "add";
+  String EDIT = "edit";
+  String REMOVE = "remove";
   String INVITE_ONLY = "invite_only";
   String ACTIVITIES = "activities";
   String TYPE = "type";
