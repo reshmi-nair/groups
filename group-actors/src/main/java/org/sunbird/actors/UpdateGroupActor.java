@@ -53,11 +53,6 @@ public class UpdateGroupActor extends BaseActor {
           (String) actorMessage.getContext().get(JsonKey.USER_ID));
     }
 
-    // activity operations to group
-    Map activityOperationMap = (Map) actorMessage.getRequest().get(JsonKey.ACTIVITIES);
-    if (MapUtils.isNotEmpty(activityOperationMap)) {
-      groupService.handleActivityOperations(group.getId(), activityOperationMap);
-    }
     Response response = groupService.updateGroup(group);
     response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
     response.setResponseCode(ResponseCode.OK.getCode());
