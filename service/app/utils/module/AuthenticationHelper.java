@@ -7,7 +7,6 @@ import org.sunbird.sso.SSOServiceFactory;
 import org.sunbird.util.JsonKey;
 import org.sunbird.util.helper.PropertiesCache;
 
-
 /**
  * This class will handle all the method related to authentication. For example verifying user
  * access token, creating access token after success login.
@@ -43,5 +42,4 @@ public class AuthenticationHelper {
     }
     return userId;
   }
-  
 }

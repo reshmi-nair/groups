@@ -17,12 +17,19 @@
             <artifactId>sb-actor</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.sunbird</groupId>
             <artifactId>sb-utils</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>org.sunbird</groupId>
             <artifactId>cassandra-utils</artifactId>
             <version>${project.version}</version>

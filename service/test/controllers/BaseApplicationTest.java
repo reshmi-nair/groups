@@ -25,10 +25,17 @@ import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.test.Helpers;
+import utils.module.OnRequestHandler;
+import utils.module.RequestInterceptor;
 import utils.module.StartModule;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({org.sunbird.Application.class, ActorRef.class})
+@PrepareForTest({
+  org.sunbird.Application.class,
+  RequestInterceptor.class,
+  OnRequestHandler.class,
+  ActorRef.class
+})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 public abstract class BaseApplicationTest {
   protected Application application;
@@ -50,6 +57,9 @@ public abstract class BaseApplicationTest {
       props = Props.create(actorClass);
       actorRef = system.actorOf(props);
       applicationSetUp();
+      PowerMockito.mockStatic(RequestInterceptor.class);
+      PowerMockito.when(RequestInterceptor.verifyRequestData(Mockito.any())).thenReturn("userId");
+      PowerMockito.mockStatic(OnRequestHandler.class);
     } catch (Exception e) {
       System.out.println("exception occurred " + e.getMessage());
     }

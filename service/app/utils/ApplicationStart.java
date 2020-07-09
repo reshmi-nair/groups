@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import org.sunbird.Application;
 import org.sunbird.exception.BaseException;
 import org.sunbird.util.DBUtil;
+import org.sunbird.util.HttpClientUtil;
 import play.api.Environment;
 import play.api.inject.ApplicationLifecycle;
 
@@ -27,6 +28,7 @@ public class ApplicationStart {
     Application.getInstance().init();
     setEnvironment(environment);
     checkCassandraConnections();
+    HttpClientUtil.getInstance();
     // Shut-down hook
     lifecycle.addStopHook(
         () -> {

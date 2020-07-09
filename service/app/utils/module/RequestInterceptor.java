@@ -1,6 +1,10 @@
 package utils.module;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,11 +12,6 @@ import org.sunbird.auth.verifier.ManagedTokenValidator;
 import org.sunbird.request.HeaderParam;
 import org.sunbird.util.JsonKey;
 import play.mvc.Http;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Request interceptor responsible to authenticated HTTP requests
@@ -61,32 +60,31 @@ public class RequestInterceptor {
     request.flash().put(JsonKey.MANAGED_FOR, null);
     Optional<String> accessToken = request.header(HeaderParam.X_Authenticated_User_Token.getName());
     Optional<String> authClientId = request.header(HeaderParam.X_Authenticated_Client_Id.getName());
-      // The API must be invoked with either access token or client token.
-      if (accessToken.isPresent()) {
-        clientId = AuthenticationHelper.verifyUserAccesToken(accessToken.get());
-        if (!JsonKey.USER_UNAUTH_STATES.contains(clientId)) {
-          // Now we have some valid token, next verify if the token is matching the request.
-          String requestedForUserID = getUserRequestedFor(request);
-          if (StringUtils.isNotEmpty(requestedForUserID) && !requestedForUserID.equals(clientId)) {
-            // LUA - MUA user combo, check the 'for' token and its parent, child identifiers
-            Optional<String> forTokenHeader =
-                request.header(HeaderParam.X_Authenticated_For.getName());
-            String managedAccessToken = forTokenHeader.isPresent() ? forTokenHeader.get() : "";
-            if (StringUtils.isNotEmpty(managedAccessToken)) {
-              String managedFor =
-                  ManagedTokenValidator.verify(managedAccessToken, clientId, requestedForUserID);
-              if (!JsonKey.USER_UNAUTH_STATES.contains(managedFor)) {
-                request.flash().put(JsonKey.MANAGED_FOR, managedFor);
-              } else {
-                clientId = JsonKey.UNAUTHORIZED;
-              }
+    // The API must be invoked with either access token or client token.
+    if (accessToken.isPresent()) {
+      clientId = AuthenticationHelper.verifyUserAccesToken(accessToken.get());
+      if (!JsonKey.USER_UNAUTH_STATES.contains(clientId)) {
+        // Now we have some valid token, next verify if the token is matching the request.
+        String requestedForUserID = getUserRequestedFor(request);
+        if (StringUtils.isNotEmpty(requestedForUserID) && !requestedForUserID.equals(clientId)) {
+          // LUA - MUA user combo, check the 'for' token and its parent, child identifiers
+          Optional<String> forTokenHeader =
+              request.header(HeaderParam.X_Authenticated_For.getName());
+          String managedAccessToken = forTokenHeader.isPresent() ? forTokenHeader.get() : "";
+          if (StringUtils.isNotEmpty(managedAccessToken)) {
+            String managedFor =
+                ManagedTokenValidator.verify(managedAccessToken, clientId, requestedForUserID);
+            if (!JsonKey.USER_UNAUTH_STATES.contains(managedFor)) {
+              request.flash().put(JsonKey.MANAGED_FOR, managedFor);
+            } else {
+              clientId = JsonKey.UNAUTHORIZED;
             }
-          } else {
-            logger.info("Ignoring x-authenticated-for token...");
           }
+        } else {
+          logger.info("Ignoring x-authenticated-for token...");
         }
       }
-      return clientId;
+    }
+    return clientId;
   }
-  
 }

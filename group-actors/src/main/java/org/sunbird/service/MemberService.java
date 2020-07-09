@@ -22,4 +22,7 @@ public interface MemberService {
 
   List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
       throws BaseException;
+
+  Map<String, String> fetchGroupRoleByUser(List<String> groupIds, String userId)
+      throws BaseException;
 }

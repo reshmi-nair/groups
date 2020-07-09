@@ -73,8 +73,7 @@ public interface JsonKey {
   String SSO_USERNAME = "sso.username";
   String MESSAGE_ID = "X-msgId";
   String ANONYMOUS = "Anonymous";
-  List<String> USER_UNAUTH_STATES =
-    Arrays.asList(JsonKey.UNAUTHORIZED, JsonKey.ANONYMOUS);
+  List<String> USER_UNAUTH_STATES = Arrays.asList(JsonKey.UNAUTHORIZED, JsonKey.ANONYMOUS);
   String IS_AUTH_REQ = "isAuthReq";
   String REQUEST = "request";
   String IS_SSO_ENABLED = "sso.enabled";
@@ -87,15 +86,18 @@ public interface JsonKey {
   String ACCESS_TOKEN_PUBLICKEY_BASEPATH = "accesstoken.publickey.basepath";
   String ACCESS_TOKEN_PUBLICKEY_KEYPREFIX = "accesstoken.publickey.keyprefix";
   String ACCESS_TOKEN_PUBLICKEY_KEYCOUNT = "accesstoken.publickey.keycount";
-  
   String MEMBER_ROLE = "memberRole";
   String MEMBER_ADD = "add";
   String MEMBER_EDIT = "edit";
   String MEMBER_REMOVE = "remove";
   String INVITE_ONLY = "invite_only";
-  String MODERATED = "moderated";
   String ACTIVITIES = "activities";
   String TYPE = "type";
   String CREATED_ON = "createdOn";
   String UPDATED_ON = "updatedOn";
+  String USER_SERVICE_BASE_URL = "LEARNER_SERVICE_PORT";
+  String USER_SERVICE_SEARCH_URL = "user_service_search_url";
+  String CONTENT = "content";
+  String USERNAME = "userName";
+  String RESULT = "result";
 }

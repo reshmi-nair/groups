@@ -2,13 +2,11 @@ package org.sunbird.dao.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.cassandra.CassandraOperation;
@@ -73,14 +71,16 @@ public class MemberDaoImpl implements MemberDao {
     }
     for (Map<String, Map<String, Object>> record : list) {
       Map<String, Object> nonPKRecord = record.get(Constants.NON_PRIMARY_KEY);
-      Map<String, Object> filteredNonPKRecord = nonPKRecord.entrySet()
+      Map<String, Object> filteredNonPKRecord =
+          nonPKRecord
+              .entrySet()
               .stream()
               .filter(map -> (map.getValue() != null))
               .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
-      record.put(Constants.NON_PRIMARY_KEY,filteredNonPKRecord);
+      record.put(Constants.NON_PRIMARY_KEY, filteredNonPKRecord);
     }
     Response response =
-            cassandraOperation.batchUpdate(DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, list);
+        cassandraOperation.batchUpdate(DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, list);
     return response;
   }
 
@@ -94,6 +94,18 @@ public class MemberDaoImpl implements MemberDao {
     Response responseObj =
         cassandraOperation.getRecordsByProperties(
             DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties, fields);
+    return responseObj;
+  }
+
+  @Override
+  public Response fetchGroupRoleByUser(List<String> groupIds, String userId) throws BaseException {
+    Map<String, Object> properties = new HashMap<>();
+    properties.put(JsonKey.GROUP_ID, groupIds);
+    properties.put(JsonKey.STATUS, JsonKey.ACTIVE);
+    properties.put(JsonKey.USER_ID, userId);
+    Response responseObj =
+        cassandraOperation.getRecordsByProperties(
+            DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties);
     return responseObj;
   }
 }

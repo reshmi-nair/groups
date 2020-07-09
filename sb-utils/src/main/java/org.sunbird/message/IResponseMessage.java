@@ -22,12 +22,12 @@ public interface IResponseMessage {
   String RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND";
   String SERVICE_UNAVAILABLE = "SERVICE UNAVAILABLE";
   String INVALID_PARAMETER_VALUE = "INVALID_PARAMETER_VALUE";
-  
+
   interface Key {
     String UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
     String KEY_CLOAK_DEFAULT_ERROR = "KEY_CLOAK_DEFAULT_ERROR";
   }
-  
+
   interface Message {
     String UNAUTHORIZED_USER = "You are not authorized.";
     String KEY_CLOAK_DEFAULT_ERROR = "server error at sso.";

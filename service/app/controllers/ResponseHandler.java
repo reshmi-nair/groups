@@ -6,8 +6,10 @@ import org.sunbird.response.Response;
 import org.sunbird.response.ResponseFactory;
 import org.sunbird.util.JsonKey;
 import play.libs.Json;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
+import utils.module.RequestMapper;
 
 /**
  * this class is used to handle the request and ask from actor and return response on the basis of
@@ -16,6 +18,7 @@ import play.mvc.Results;
 public class ResponseHandler {
 
   private ResponseHandler() {}
+
   /**
    * This method will handle all the failure response of Api calls.
    *
@@ -36,6 +39,19 @@ public class ResponseHandler {
         result = Results.internalServerError(Json.toJson(response));
         break;
     }
+    return result;
+  }
+  /**
+   * This method will handle all the failure response of Api calls.
+   *
+   * @param
+   * @return
+   */
+  public static Result handleFailureResponse(Object exception, Http.Request request) {
+    RequestMapper requestMapper = new RequestMapper();
+    Result result;
+    Request sbReq = requestMapper.createSBRequest(request);
+    result = handleFailureResponse(exception, sbReq);
     return result;
   }
 

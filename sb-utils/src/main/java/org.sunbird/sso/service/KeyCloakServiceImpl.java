@@ -1,22 +1,20 @@
 package org.sunbird.sso.service;
 
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.keycloak.RSATokenVerifier;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.sso.KeyCloakConnectionProvider;
 import org.sunbird.sso.SSOManager;
 import org.sunbird.util.JsonKey;
-
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.*;
 
 /**
  * Single sign out service implementation with Key Cloak.
@@ -24,7 +22,7 @@ import java.util.*;
  * @author Manzarul
  */
 public class KeyCloakServiceImpl implements SSOManager {
-  
+
   private Logger logger = LoggerFactory.getLogger(KeyCloakServiceImpl.class);
 
   private Keycloak keycloak = KeyCloakConnectionProvider.getConnection();
@@ -69,7 +67,7 @@ public class KeyCloakServiceImpl implements SSOManager {
   }
 
   @Override
-  public String verifyToken(String accessToken, String url)  {
+  public String verifyToken(String accessToken, String url) {
 
     try {
       PublicKey publicKey = getPublicKey();
@@ -108,8 +106,7 @@ public class KeyCloakServiceImpl implements SSOManager {
         }
         return token.getSubject();
       } else {
-        logger.error(
-            "KeyCloakServiceImpl:verifyToken: SSO_PUBLIC_KEY is NULL.");
+        logger.error("KeyCloakServiceImpl:verifyToken: SSO_PUBLIC_KEY is NULL.");
         throw new BaseException(
             ResponseCode.keyCloakDefaultError.getErrorCode(),
             ResponseCode.keyCloakDefaultError.getErrorMessage(),

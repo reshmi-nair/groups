@@ -2,18 +2,6 @@ package org.sunbird.sso.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sunbird.util.JsonKey;
-import org.sunbird.util.helper.PropertiesCache;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -23,12 +11,22 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sunbird.util.JsonKey;
+import org.sunbird.util.helper.PropertiesCache;
 
 /** Class to fetch SSO public key from Keycloak server using 'certs' HTTP API call. */
 public class KeyCloakRsaKeyFetcher {
   private static final String MODULUS = "modulusBase64";
   private static final String EXPONENT = "exponentBase64";
-  
+
   private Logger logger = LoggerFactory.getLogger(KeyCloakRsaKeyFetcher.class);
 
   /**

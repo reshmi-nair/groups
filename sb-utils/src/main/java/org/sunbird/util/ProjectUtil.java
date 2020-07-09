@@ -9,7 +9,7 @@ import java.util.*;
  * @author Manzarul
  */
 public class ProjectUtil {
-  
+
   public enum Method {
     GET,
     POST,
@@ -17,7 +17,7 @@ public class ProjectUtil {
     DELETE,
     PATCH
   }
-  
+
   /**
    * This method will provide formatted date
    *
@@ -26,11 +26,10 @@ public class ProjectUtil {
   public static String getFormattedDate() {
     return getDateFormatter().format(new Date());
   }
-  
+
   public static SimpleDateFormat getDateFormatter() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSSZ");
     simpleDateFormat.setLenient(false);
     return simpleDateFormat;
   }
-  
 }

@@ -1,5 +1,8 @@
 package org.sunbird.sso.service;
 
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.security.PublicKey;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -18,10 +21,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.sunbird.sso.KeyCloakConnectionProvider;
-
-import java.security.PublicKey;
-
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 // ** @author kirti. Junit test cases *//*

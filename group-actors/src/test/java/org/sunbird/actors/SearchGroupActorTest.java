@@ -33,9 +33,9 @@ import org.sunbird.util.JsonKey;
 @PrepareForTest({Localizer.class, ServiceFactory.class})
 @PowerMockIgnore({"javax.management.*"})
 public class SearchGroupActorTest extends BaseActorTest {
-
+  private static final String GROUP_MEMBER_TABLE = "group_member";
   private final Props props = Props.create(org.sunbird.actors.SearchGroupActor.class);
-  public static CassandraOperation cassandraOperation;
+  public CassandraOperation cassandraOperation;
 
   @Before
   public void setUp() throws Exception {
@@ -65,11 +65,11 @@ public class SearchGroupActorTest extends BaseActorTest {
           .thenReturn(getGroupSetByUserId());
 
       when(cassandraOperation.getRecordsByProperties(
-              Mockito.anyString(), Mockito.anyString(), Mockito.anyMap(), Mockito.anyList()))
+              Mockito.anyString(), Matchers.eq(GROUP_MEMBER_TABLE), Mockito.anyMap()))
           .thenReturn(getMemberResponseByGroupIds());
 
       when(cassandraOperation.getRecordsByProperties(
-              Mockito.anyString(), Mockito.anyString(), Mockito.anyMap()))
+              Mockito.anyString(), Matchers.eq("group"), Mockito.anyMap()))
           .thenReturn(getGroupsDetailsResponse());
 
     } catch (BaseException be) {

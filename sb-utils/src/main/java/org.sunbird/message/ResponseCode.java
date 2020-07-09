@@ -6,7 +6,8 @@ import org.sunbird.util.JsonKey;
 public enum ResponseCode {
   unAuthorized(IResponseMessage.Key.UNAUTHORIZED_USER, IResponseMessage.Message.UNAUTHORIZED_USER),
   keyCloakDefaultError(
-    IResponseMessage.Key.KEY_CLOAK_DEFAULT_ERROR, IResponseMessage.Message.KEY_CLOAK_DEFAULT_ERROR),
+      IResponseMessage.Key.KEY_CLOAK_DEFAULT_ERROR,
+      IResponseMessage.Message.KEY_CLOAK_DEFAULT_ERROR),
   OK(200),
   CLIENT_ERROR(400),
   SERVER_ERROR(500),
@@ -17,7 +18,6 @@ public enum ResponseCode {
   TOO_MANY_REQUESTS(429),
   SERVICE_UNAVAILABLE(503),
   BAD_REQUEST(400);
-  
 
   private int code;
   /** error code contains String value */
@@ -28,7 +28,7 @@ public enum ResponseCode {
   ResponseCode(int code) {
     this.code = code;
   }
-  
+
   /**
    * @param errorCode String
    * @param errorMessage String
@@ -41,7 +41,7 @@ public enum ResponseCode {
   public int getCode() {
     return this.code;
   }
-  
+
   /**
    * This method will take header response code as int value and it provide matched enum value, if
    * code is not matched or exception occurs then it will provide SERVER_ERROR
@@ -64,7 +64,7 @@ public enum ResponseCode {
     }
     return ResponseCode.SERVER_ERROR;
   }
-  
+
   /**
    * This method will provide ResponseCode enum based on error code
    *
@@ -87,16 +87,16 @@ public enum ResponseCode {
       return value;
     }
   }
-  
+
   public int getResponseCode() {
     return code;
   }
-  
+
   /** @return */
   public String getErrorCode() {
     return errorCode;
   }
-  
+
   /** @return */
   public String getErrorMessage() {
     return errorMessage;

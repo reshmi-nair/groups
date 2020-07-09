@@ -1,10 +1,10 @@
 package org.sunbird.util;
 
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.sunbird.models.GroupResponse;
-import org.sunbird.models.MemberResponse;
 
 public class GroupUtil {
 
@@ -12,35 +12,26 @@ public class GroupUtil {
    * Update Role details in the group of a user
    *
    * @param groups
-   * @param members
-   * @param userId
+   * @param groupRoleMap
    */
-  public static void updateRoles(
-      List<GroupResponse> groups, List<MemberResponse> members, String userId) {
+  public static void updateRoles(List<GroupResponse> groups, Map<String, String> groupRoleMap) {
     if (!groups.isEmpty()) {
-      Map<String, String> groupRoleMap = getGroupRoleOfUser(members, userId);
       for (GroupResponse group : groups) {
         group.setMemberRole(groupRoleMap.get(group.getId()));
       }
     }
   }
 
-  /**
-   * Get the role of a user in each group and return a mapping with group id
-   *
-   * @param members
-   * @param userId
-   * @return groupRoleMap
-   */
-  private static Map<String, String> getGroupRoleOfUser(
-      List<MemberResponse> members, String userId) {
-    Map<String, String> groupRoleMap = new HashMap<>();
-    members.forEach(
-        map -> {
-          if (userId.equals(map.getUserId())) {
-            groupRoleMap.put(map.getGroupId(), map.getRole());
-          }
-        });
-    return groupRoleMap;
+  public static String convertTimestampToUTC(long timeInMs) {
+    Date date = new Date(timeInMs);
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSSZ");
+    simpleDateFormat.setLenient(false);
+    return simpleDateFormat.format(date);
+  }
+
+  public static String convertDateToUTC(Date date) {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSSZ");
+    simpleDateFormat.setLenient(false);
+    return simpleDateFormat.format(date);
   }
 }

@@ -1,15 +1,13 @@
 package org.sunbird.util.helper;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sunbird.sso.KeyCloakConnectionProvider;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * @author Amit Kumar
@@ -18,18 +16,18 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PropertiesCache {
 
+  Logger logger = LoggerFactory.getLogger(PropertiesCache.class);
   private final String[] fileName = {
     "cassandra.config.properties",
     "dbconfig.properties",
     "externalresource.properties",
     "sso.properties",
   };
-  
-  private static Logger logger = LoggerFactory.getLogger(PropertiesCache.class);
+
   private final Properties configProp = new Properties();
   public final Map<String, Float> attributePercentageMap = new ConcurrentHashMap<>();
   private static PropertiesCache propertiesCache = null;
-  
+
   /** private default constructor */
   private PropertiesCache() {
     for (String file : fileName) {
@@ -41,9 +39,9 @@ public class PropertiesCache {
       }
     }
   }
-  
+
   public static PropertiesCache getInstance() {
-    
+
     // change the lazy holder implementation to simple singleton implementation ...
     if (null == propertiesCache) {
       synchronized (PropertiesCache.class) {
@@ -54,7 +52,7 @@ public class PropertiesCache {
     }
     return propertiesCache;
   }
-  
+
   /**
    * Method to read value from resource file .
    *
@@ -64,11 +62,11 @@ public class PropertiesCache {
   public String getProperty(String key) {
     return configProp.getProperty(key) != null ? configProp.getProperty(key) : key;
   }
-  
+
   public void saveConfigProperty(String key, String value) {
     configProp.setProperty(key, value);
   }
-  
+
   /**
    * Method to read value from resource file .
    *
@@ -80,7 +78,7 @@ public class PropertiesCache {
     if (StringUtils.isNotBlank(value)) return value;
     return configProp.getProperty(key);
   }
-  
+
   public static String getConfigValue(String key) {
     if (StringUtils.isNotBlank(System.getenv(key))) {
       return System.getenv(key);

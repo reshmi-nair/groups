@@ -12,7 +12,7 @@ public interface SSOManager {
    * @return String
    */
   String verifyToken(String token);
-  
+
   /**
    * This method will verify user access token and provide userId if token is valid. in case of
    * invalid access token it will throw ProjectCommon exception with 401.

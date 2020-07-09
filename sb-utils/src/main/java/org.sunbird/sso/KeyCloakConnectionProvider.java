@@ -21,7 +21,7 @@ public class KeyCloakConnectionProvider {
   public static String SSO_URL = null;
   public static String SSO_REALM = null;
   public static String CLIENT_ID = null;
-  
+
   private static Logger logger = LoggerFactory.getLogger(KeyCloakConnectionProvider.class);
 
   static {
@@ -86,8 +86,7 @@ public class KeyCloakConnectionProvider {
         || StringUtils.isBlank(password)
         || StringUtils.isBlank(cleintId)
         || StringUtils.isBlank(relam)) {
-      logger.info(
-          "key cloak connection is not provided by Environment variable.");
+      logger.info("key cloak connection is not provided by Environment variable.");
       return null;
     }
     SSO_URL = url;
@@ -108,13 +107,11 @@ public class KeyCloakConnectionProvider {
 
     if (StringUtils.isNotBlank(clientSecret)) {
       keycloakBuilder.clientSecret(clientSecret);
-      logger.info(
-          "KeyCloakConnectionProvider:initialiseEnvConnection client sceret is provided.");
+      logger.info("KeyCloakConnectionProvider:initialiseEnvConnection client sceret is provided.");
     }
     keycloakBuilder.grantType("client_credentials");
     keycloak = keycloakBuilder.build();
-    logger.info(
-        "key cloak instance is created from Environment variable settings .");
+    logger.info("key cloak instance is created from Environment variable settings .");
     return keycloak;
   }
 

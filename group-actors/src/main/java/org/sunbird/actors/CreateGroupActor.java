@@ -55,7 +55,6 @@ public class CreateGroupActor extends BaseActor {
       Response addMembersRes = memberService.handleMemberAddition(memberList, groupId);
       logger.info("Adding members to the group ended : {}", addMembersRes.getResult());
     }
-
     Response response = new Response();
     response.put(JsonKey.GROUP_ID, groupId);
     sender().tell(response, self());
