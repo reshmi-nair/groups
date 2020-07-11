@@ -121,11 +121,13 @@ public class ReadGroupActorTest extends BaseActorTest {
     Map<String, Object> result = new HashMap<>();
     List<Map<String, Object>> userList = new ArrayList<>();
     Map<String, Object> member1 = new HashMap<>();
-    member1.put(JsonKey.ID, "userid1");
-    member1.put(JsonKey.NAME, "John");
+    member1.put(JsonKey.ID, "user7");
+    member1.put(JsonKey.FIRSTNAME, "John");
+    member1.put(JsonKey.LASTNAME, null);
     Map<String, Object> member2 = new HashMap<>();
-    member2.put(JsonKey.ID, "userid2");
-    member2.put(JsonKey.NAME, "Terry");
+    member2.put(JsonKey.ID, "user6");
+    member2.put(JsonKey.FIRSTNAME, "Terry");
+    member2.put(JsonKey.LASTNAME, "Test");
     userList.add(member1);
     userList.add(member2);
     Map<String, Object> content = new HashMap<>();
