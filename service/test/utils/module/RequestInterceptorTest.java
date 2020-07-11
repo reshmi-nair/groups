@@ -19,7 +19,6 @@ import play.test.Helpers;
 import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
   RequestInterceptor.class,
