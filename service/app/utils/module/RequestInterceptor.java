@@ -31,7 +31,6 @@ public class RequestInterceptor {
   
     apiHeaderIgnoreMap.put("/service/health", var);
     apiHeaderIgnoreMap.put("/health", var);
-
   }
   
   private static String getUserRequestedFor(Http.Request request) {
