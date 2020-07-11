@@ -100,13 +100,13 @@ public class MemberResponse {
     this.removedBy = removedBy;
   }
 
-  private String userName = "";
+  private String name = "";
 
-  public void setUserName(String userName) {
-    this.userName = userName;
+  public void setName(String Name) {
+    this.name = name;
   }
 
-  public String getUserName() {
-    return userName;
+  public String getName() {
+    return name;
   }
 }

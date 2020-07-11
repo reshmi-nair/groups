@@ -2,10 +2,7 @@ package org.sunbird.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -107,7 +104,7 @@ public class MemberServiceImpl implements MemberService {
     return addMemberRes;
   }
 
-  // TODO: Fix me to get the Members Details with List<Member> includes username
+  // TODO: Fix me to get the Members Details with List<Member> includes name of the user
 
   /**
    * Fetch Member Details based on Group
@@ -163,7 +160,14 @@ public class MemberServiceImpl implements MemberService {
                       .findFirst()
                       .orElse(null);
               if (userInfo != null) {
-                member.setUserName((String) userInfo.get(JsonKey.USERNAME));
+                String firstName = (String) userInfo.get(JsonKey.FIRSTNAME)!=null
+                        ? (String) userInfo.get(JsonKey.FIRSTNAME)
+                        : "";
+
+                String lastName = (String) userInfo.get(JsonKey.LASTNAME)!=null
+                        ? (String) userInfo.get(JsonKey.LASTNAME)
+                        : "";
+                member.setName(firstName+ " " + lastName);
               }
             });
       }

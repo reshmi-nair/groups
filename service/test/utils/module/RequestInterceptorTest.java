@@ -2,6 +2,7 @@ package utils.module;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -18,7 +19,7 @@ import play.test.Helpers;
 import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
-
+@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
   RequestInterceptor.class,

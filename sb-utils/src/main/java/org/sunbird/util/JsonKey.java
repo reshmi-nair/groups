@@ -105,4 +105,7 @@ public interface JsonKey {
   String PRIVATE = "private";
   String ACTIVITY = "activity";
   String FIELDS = "fields";
+  String FIRSTNAME = "firstName";
+  String LASTNAME = "lastName";
+  String NAME = "name";
 }
