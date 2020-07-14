@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.sunbird.Application;
+import org.sunbird.auth.verifier.KeyManager;
 import org.sunbird.exception.BaseException;
 import org.sunbird.util.ActivityConfigReader;
 import org.sunbird.util.DBUtil;
