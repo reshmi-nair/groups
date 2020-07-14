@@ -126,7 +126,6 @@ public class MemberDaoImpl implements MemberDao {
   public Response fetchGroupRoleByUser(List<String> groupIds, String userId) throws BaseException {
     Map<String, Object> properties = new HashMap<>();
     properties.put(JsonKey.GROUP_ID, groupIds);
-    properties.put(JsonKey.STATUS, JsonKey.ACTIVE);
     properties.put(JsonKey.USER_ID, userId);
     Response responseObj =
         cassandraOperation.getRecordsByProperties(

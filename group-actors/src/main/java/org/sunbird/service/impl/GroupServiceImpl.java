@@ -58,13 +58,14 @@ public class GroupServiceImpl implements GroupService {
     Map<String, Object> dbResGroup = new HashMap<>();
     Response responseObj = groupDao.readGroup(groupId);
     if (null != responseObj && null != responseObj.getResult()) {
-
       List<Map<String, Object>> dbGroupDetails =
           (List<Map<String, Object>>) responseObj.getResult().get(JsonKey.RESPONSE);
-      if (null != dbGroupDetails && !dbGroupDetails.isEmpty()) {
+
+      if (null != dbGroupDetails
+          && !dbGroupDetails.isEmpty()
+          && JsonKey.ACTIVE.equals(dbGroupDetails.get(0).get(JsonKey.STATUS))) {
 
         dbResGroup = dbGroupDetails.get(0);
-
         // update createdOn, updatedOn format to utc "yyyy-MM-dd HH:mm:ss:SSSZ
 
         dbResGroup.put(
@@ -182,11 +183,31 @@ public class GroupServiceImpl implements GroupService {
       List<Map<String, Object>> dbResGroupIds =
           (List<Map<String, Object>>) groupIdsResponse.getResult().get(JsonKey.RESPONSE);
       if (null != dbResGroupIds && !dbResGroupIds.isEmpty()) {
+        // remove groups where user is inactive
+        filterOutInActiveGroups(dbResGroupIds);
         Set<String> groupIdsSet = (Set<String>) dbResGroupIds.get(0).get(JsonKey.GROUP_ID);
         return new ArrayList<>(groupIdsSet);
       }
     }
     return new ArrayList<>();
+  }
+
+  /**
+   * Filter Only Active Groups
+   *
+   * @param dbResGroupIds
+   * @return
+   */
+  private List<Map<String, Object>> filterOutInActiveGroups(
+      List<Map<String, Object>> dbResGroupIds) {
+    List<Map<String, Object>> activeGroupLists = new ArrayList<>();
+    dbResGroupIds.forEach(
+        map -> {
+          if (JsonKey.ACTIVE.equals(map.get(JsonKey.STATUS))) {
+            activeGroupLists.add(map);
+          }
+        });
+    return activeGroupLists;
   }
 
   /**
@@ -207,8 +228,10 @@ public class GroupServiceImpl implements GroupService {
         dbGroupDetails.forEach(
             map -> {
               Group group = objectMapper.convertValue(map, Group.class);
-              GroupResponse groupResponse = createGroupResponseObj(group);
-              groups.add(groupResponse);
+              if (JsonKey.ACTIVE.equals(group.getStatus())) {
+                GroupResponse groupResponse = createGroupResponseObj(group);
+                groups.add(groupResponse);
+              }
             });
       }
     }

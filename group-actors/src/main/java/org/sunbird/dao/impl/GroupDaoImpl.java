@@ -63,7 +63,6 @@ public class GroupDaoImpl implements GroupDao {
   public Response readGroups(List<String> groupIds) throws BaseException {
     Map<String, Object> properties = new HashMap<>();
     properties.put(JsonKey.ID, groupIds);
-    properties.put(JsonKey.STATUS, JsonKey.ACTIVE);
     Response responseObj =
         cassandraOperation.getRecordsByProperties(
             DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, properties);
