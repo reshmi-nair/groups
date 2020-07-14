@@ -113,7 +113,6 @@ public class ManagedTokenValidator {
       }
     } catch (Exception ex) {
       logger.error("Exception in ManagedTokenValidator: verify {} ", ex.getMessage());
-      ex.printStackTrace();
     }
 
     return managedFor;

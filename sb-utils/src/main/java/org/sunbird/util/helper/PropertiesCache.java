@@ -60,6 +60,8 @@ public class PropertiesCache {
    * @return value corresponding to given key if found else will return key itself.
    */
   public String getProperty(String key) {
+    String value = System.getenv(key);
+    if (StringUtils.isNotBlank(value)) return value;
     return configProp.getProperty(key) != null ? configProp.getProperty(key) : key;
   }
 

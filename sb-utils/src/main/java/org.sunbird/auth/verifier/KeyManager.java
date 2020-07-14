@@ -40,7 +40,6 @@ public class KeyManager {
       }
     } catch (Exception e) {
       logger.error("KeyManager:init: exception in loading publickeys {}", e.getMessage());
-      e.printStackTrace();
     }
   }
 
