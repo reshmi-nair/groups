@@ -227,6 +227,7 @@ public class GroupServiceImpl implements GroupService {
     groupResponse.setDescription(group.getDescription());
     groupResponse.setName(group.getName());
     groupResponse.setStatus(group.getStatus());
+    groupResponse.setMembershipType(group.getMembershipType());
     groupResponse.setActivities(group.getActivities());
     groupResponse.setCreatedBy(group.getCreatedBy());
     groupResponse.setUpdatedBy(group.getUpdatedBy());

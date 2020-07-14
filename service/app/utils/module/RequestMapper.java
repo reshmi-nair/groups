@@ -23,6 +23,7 @@ public class RequestMapper {
 
     Request request = Json.fromJson(requestData, Request.class);
     request.getContext().put(JsonKey.USER_ID, httpReq.flash().get(JsonKey.USER_ID));
+    request.getContext().put(JsonKey.MANAGED_FOR, httpReq.flash().get(JsonKey.MANAGED_FOR));
     request.setPath(httpReq.path());
 
     return request;

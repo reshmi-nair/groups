@@ -3,6 +3,7 @@ package org.sunbird.actors;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.ResponseCode;
@@ -42,6 +43,7 @@ public class UpdateGroupActor extends BaseActor {
    */
   private void updateGroup(Request actorMessage) throws BaseException {
     logger.info("UpdateGroup method call");
+
     GroupRequestHandler requestHandler = new GroupRequestHandler();
     Group group = requestHandler.handleUpdateGroupRequest(actorMessage);
 
@@ -51,7 +53,7 @@ public class UpdateGroupActor extends BaseActor {
       memberService.handleMemberOperations(
           memberOperationMap,
           group.getId(),
-          (String) actorMessage.getContext().get(JsonKey.USER_ID));
+              requestHandler.getRequestedBy(actorMessage));
     }
 
     Map<String, Object> activityOperationMap =

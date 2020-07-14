@@ -25,7 +25,7 @@ public class GroupRequestHandler {
       group.setMembershipType(JsonKey.INVITE_ONLY);
     }
     group.setStatus(JsonKey.ACTIVE);
-    group.setCreatedBy((String) actorMessage.getContext().get(JsonKey.USER_ID));
+    group.setCreatedBy(getRequestedBy(actorMessage));
     group.setId(UUID.randomUUID().toString());
     List<Map<String, Object>> activityList =
         (List<Map<String, Object>>) actorMessage.getRequest().get(JsonKey.ACTIVITIES);
@@ -46,8 +46,18 @@ public class GroupRequestHandler {
     if (StringUtils.isNotEmpty(status) && status.equalsIgnoreCase(JsonKey.INACTIVE)) {
       group.setStatus(status);
     }
-    group.setUpdatedBy((String) actorMessage.getContext().get(JsonKey.USER_ID));
+    group.setUpdatedBy(getRequestedBy(actorMessage));
 
     return group;
+  }
+
+  public String getRequestedBy(Request actorMessage) {
+    String contextUserId = (String) actorMessage.getContext().get(JsonKey.USER_ID);
+    String managedFor = (String) actorMessage.getContext().get(JsonKey.MANAGED_FOR);
+    //If MUA, then use that userid for createdby and updateby
+    if(StringUtils.isNotEmpty(managedFor)){
+      contextUserId = managedFor;
+    }
+    return contextUserId;
   }
 }

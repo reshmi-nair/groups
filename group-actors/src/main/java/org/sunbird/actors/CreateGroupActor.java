@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
 import org.sunbird.models.Group;
@@ -44,7 +45,7 @@ public class CreateGroupActor extends BaseActor {
    */
   private void createGroup(Request actorMessage) throws BaseException {
     logger.info("CreateGroup method call");
-    String contextUserId = (String) actorMessage.getContext().get(JsonKey.USER_ID);
+
     GroupRequestHandler requestHandler = new GroupRequestHandler();
     Group group = requestHandler.handleCreateGroupRequest(actorMessage);
     String groupId = groupService.createGroup(group);
@@ -52,7 +53,7 @@ public class CreateGroupActor extends BaseActor {
     // add creator of group to memberList as admin
     List<Map<String, Object>> memberList = new ArrayList<>();
     Map<String, Object> createdUser = new HashMap<>();
-    createdUser.put(JsonKey.USER_ID, contextUserId);
+    createdUser.put(JsonKey.USER_ID, requestHandler.getRequestedBy(actorMessage));
     createdUser.put(JsonKey.ROLE, JsonKey.ADMIN);
     memberList.add(createdUser);
 
@@ -63,7 +64,7 @@ public class CreateGroupActor extends BaseActor {
     if (CollectionUtils.isNotEmpty(reqMemberList)) {
       memberList.addAll(reqMemberList);
     }
-    Response addMembersRes = memberService.handleMemberAddition(memberList, groupId, contextUserId);
+    Response addMembersRes = memberService.handleMemberAddition(memberList, groupId, requestHandler.getRequestedBy(actorMessage));
     logger.info("Adding members to the group ended : {}", addMembersRes.getResult());
 
     Response response = new Response();

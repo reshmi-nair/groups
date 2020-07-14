@@ -32,31 +32,6 @@ public class RequestInterceptor {
     apiHeaderIgnoreMap.put("/health", var);
   }
 
-  private static String getUserRequestedFor(Http.Request request) {
-    String requestedForUserID = null;
-    JsonNode jsonBody = request.body().asJson();
-    if (!(jsonBody == null)) { // for search and update and create_mui api's
-      if (!(jsonBody.get(JsonKey.REQUEST).get(JsonKey.USER_ID) == null)) {
-        requestedForUserID = jsonBody.get(JsonKey.REQUEST).get(JsonKey.USER_ID).asText();
-      }
-    } else { // for read-api
-      String uuidSegment = null;
-      Path path = Paths.get(request.uri());
-      if (request.queryString().isEmpty()) {
-        uuidSegment = path.getFileName().toString();
-      } else {
-        String[] queryPath = path.getFileName().toString().split("\\?");
-        uuidSegment = queryPath[0];
-      }
-      try {
-        requestedForUserID = UUID.fromString(uuidSegment).toString();
-      } catch (IllegalArgumentException iae) {
-        logger.error("Perhaps this is another API, like search that doesn't carry user id.");
-      }
-    }
-    return requestedForUserID;
-  }
-
   /**
    * Authenticates given HTTP request context
    *
@@ -73,24 +48,19 @@ public class RequestInterceptor {
       if (accessToken.isPresent()) {
         clientId = AuthenticationHelper.verifyUserAccesToken(accessToken.get());
         if (!JsonKey.USER_UNAUTH_STATES.contains(clientId)) {
-          // Now we have some valid token, next verify if the token is matching the request.
-          String requestedForUserID = getUserRequestedFor(request);
-          if (StringUtils.isNotEmpty(requestedForUserID) && !requestedForUserID.equals(clientId)) {
-            // LUA - MUA user combo, check the 'for' token and its parent, child identifiers
-            Optional<String> forTokenHeader =
-                request.header(HeaderParam.X_Authenticated_For.getName());
-            String managedAccessToken = forTokenHeader.isPresent() ? forTokenHeader.get() : "";
-            if (StringUtils.isNotEmpty(managedAccessToken)) {
-              String managedFor =
-                  ManagedTokenValidator.verify(managedAccessToken, clientId, requestedForUserID);
-              if (!JsonKey.USER_UNAUTH_STATES.contains(managedFor)) {
-                request.flash().put(JsonKey.MANAGED_FOR, managedFor);
-              } else {
-                clientId = JsonKey.UNAUTHORIZED;
-              }
+          // Now we have some valid token, next verify managed user token.
+          // LUA - MUA user combo, check the 'for' token and its parent, child identifiers
+          Optional<String> forTokenHeader =
+                  request.header(HeaderParam.X_Authenticated_For.getName());
+          String managedAccessToken = forTokenHeader.isPresent() ? forTokenHeader.get() : "";
+          if (StringUtils.isNotEmpty(managedAccessToken)) {
+            String managedFor =
+                ManagedTokenValidator.verify(managedAccessToken, clientId);
+            if (!JsonKey.USER_UNAUTH_STATES.contains(managedFor)) {
+              request.flash().put(JsonKey.MANAGED_FOR, managedFor);
+            } else {
+              clientId = JsonKey.UNAUTHORIZED;
             }
-          } else {
-            logger.info("Ignoring x-authenticated-for token...");
           }
         }
       }
