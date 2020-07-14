@@ -36,6 +36,7 @@ public class ApplicationStart {
         () -> {
           return CompletableFuture.completedFuture(null);
         });
+    KeyManager.init();
   }
 
   private void setEnvironment(Environment environment) {
