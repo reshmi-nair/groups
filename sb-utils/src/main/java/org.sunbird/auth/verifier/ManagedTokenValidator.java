@@ -88,7 +88,7 @@ public class ManagedTokenValidator {
       Map<Object, Object> headerData =
               mapper.readValue(new String(decodeFromBase64(header)), Map.class);
       String keyId = headerData.get("kid").toString();
-      logger.info("ManagedTokenValidator:verify: keyId: " + keyId);
+      logger.info("ManagedTokenValidator: verify: keyId: " + keyId);
       Map<String, String> tokenBody =
               mapper.readValue(new String(decodeFromBase64(body)), Map.class);
       String parentId = tokenBody.get(JsonKey.PARENT_ID);
@@ -112,7 +112,7 @@ public class ManagedTokenValidator {
         managedFor = muaId;
       }
     } catch (Exception ex) {
-      logger.error("Exception in ManagedTokenValidator: verify ", ex.getMessage());
+      logger.error("Exception in ManagedTokenValidator: verify {} ", ex.getMessage());
     }
 
     return managedFor;

@@ -130,8 +130,10 @@ public class MemberServiceImpl implements MemberService {
         dbResMembers.forEach(
             map -> {
               Member member = objectMapper.convertValue(map, Member.class);
-              MemberResponse memberResponse = createMemberResponseObj(member);
-              members.add(memberResponse);
+              if (JsonKey.ACTIVE.equals(member.getStatus())) {
+                MemberResponse memberResponse = createMemberResponseObj(member);
+                members.add(memberResponse);
+              }
             });
       }
     }

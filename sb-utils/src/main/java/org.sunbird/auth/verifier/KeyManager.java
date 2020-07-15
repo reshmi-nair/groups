@@ -39,7 +39,7 @@ public class KeyManager {
         keyMap.put(keyId, new KeyData(keyId, loadPublicKey(basePath + keyId)));
       }
     } catch (Exception e) {
-      logger.error("KeyManager:init: exception in loading publickeys ", e.getMessage());
+      logger.error("KeyManager:init: exception in loading publickeys {}", e.getMessage());
     }
   }
 
