@@ -15,7 +15,7 @@ public interface MemberService {
 
   Response removeMembers(List<Member> member) throws BaseException;
 
-  public void handleMemberOperations(Map memberOperationMap, String groupId, String contextUserId)
+  void handleMemberOperations(Map memberOperationMap, String groupId, String contextUserId)
       throws BaseException;
 
   Response handleMemberAddition(

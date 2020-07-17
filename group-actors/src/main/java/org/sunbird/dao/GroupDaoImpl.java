@@ -1,4 +1,4 @@
-package org.sunbird.dao.impl;
+package org.sunbird.dao;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.sunbird.cassandra.CassandraOperation;
-import org.sunbird.dao.GroupDao;
 import org.sunbird.exception.BaseException;
 import org.sunbird.helper.ServiceFactory;
 import org.sunbird.models.Group;

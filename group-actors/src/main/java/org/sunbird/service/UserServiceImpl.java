@@ -1,4 +1,4 @@
-package org.sunbird.service.impl;
+package org.sunbird.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +12,6 @@ import org.sunbird.exception.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.models.SearchRequest;
 import org.sunbird.response.Response;
-import org.sunbird.service.UserService;
 import org.sunbird.util.HttpClientUtil;
 import org.sunbird.util.JsonKey;
 import org.sunbird.util.helper.PropertiesCache;

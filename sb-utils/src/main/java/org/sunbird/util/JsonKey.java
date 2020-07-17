@@ -114,4 +114,5 @@ public interface JsonKey {
   String CONTENT_TYPE = "contentType";
   String FIRSTNAME = "firstName";
   String LASTNAME = "lastName";
+  String VALUE = "value";
 }

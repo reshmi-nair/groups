@@ -27,10 +27,12 @@ public interface IResponseMessage {
   interface Key {
     String UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
     String KEY_CLOAK_DEFAULT_ERROR = "KEY_CLOAK_DEFAULT_ERROR";
+    String UNABLE_TO_COMMUNICATE_WITH_ACTOR = "UNABLE_TO_COMMUNICATE_WITH_ACTOR";
   }
 
   interface Message {
     String UNAUTHORIZED_USER = "You are not authorized.";
     String KEY_CLOAK_DEFAULT_ERROR = "server error at sso.";
+    String UNABLE_TO_COMMUNICATE_WITH_ACTOR = "Unable to communicate with actor.";
   }
 }

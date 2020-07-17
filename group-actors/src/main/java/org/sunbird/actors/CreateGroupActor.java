@@ -5,27 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
 import org.sunbird.models.Group;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.GroupService;
+import org.sunbird.service.GroupServiceImpl;
 import org.sunbird.service.MemberService;
-import org.sunbird.service.impl.GroupServiceImpl;
-import org.sunbird.service.impl.MemberServiceImpl;
+import org.sunbird.service.MemberServiceImpl;
 import org.sunbird.util.GroupRequestHandler;
 import org.sunbird.util.JsonKey;
 
 @ActorConfig(
   tasks = {"createGroup"},
-  asyncTasks = {}
+  asyncTasks = {},
+  dispatcher = "group-dispatcher"
 )
 public class CreateGroupActor extends BaseActor {
-
-  private GroupService groupService = GroupServiceImpl.getInstance();
-  private MemberService memberService = MemberServiceImpl.getInstance();
 
   @Override
   public void onReceive(Request request) throws Throwable {
@@ -45,6 +42,8 @@ public class CreateGroupActor extends BaseActor {
    */
   private void createGroup(Request actorMessage) throws BaseException {
     logger.info("CreateGroup method call");
+    GroupService groupService = new GroupServiceImpl();
+    MemberService memberService = new MemberServiceImpl();
 
     GroupRequestHandler requestHandler = new GroupRequestHandler();
     Group group = requestHandler.handleCreateGroupRequest(actorMessage);
@@ -64,7 +63,9 @@ public class CreateGroupActor extends BaseActor {
     if (CollectionUtils.isNotEmpty(reqMemberList)) {
       memberList.addAll(reqMemberList);
     }
-    Response addMembersRes = memberService.handleMemberAddition(memberList, groupId, requestHandler.getRequestedBy(actorMessage));
+    Response addMembersRes =
+        memberService.handleMemberAddition(
+            memberList, groupId, requestHandler.getRequestedBy(actorMessage));
     logger.info("Adding members to the group ended : {}", addMembersRes.getResult());
 
     Response response = new Response();

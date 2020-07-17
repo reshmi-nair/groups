@@ -12,7 +12,27 @@
     "appIcon",
     "mimeType",
     "topic",
-    "resourceType"
+    "resourceType",
+    "pkgVersion",
+    "subject",
+    "medium",
+    "board",
+    "framework",
+    "gradeLevel",
+    "channel",
+    "status",
+    "downloadUrl",
+    "variants",
+    "createdBy",
+    "originData",
+    "origin",
+    "streamingUrl",
+    "dialecodes",
+    "size",
+    "batches",
+    "leafNodes",
+    "leafNodesCount",
+    "lastUpdatedOn"
   ]
   }]
 }

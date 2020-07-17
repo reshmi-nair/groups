@@ -5,7 +5,10 @@ public enum ActorOperations {
   CREATE_GROUP("createGroup"),
   UPDATE_GROUP("updateGroup"),
   READ_GROUP("readGroup"),
-  SEARCH_GROUP("searchGroup");
+  SEARCH_GROUP("searchGroup"),
+  SET_CACHE("setCache"),
+  DEL_CACHE("delCache"),
+  GET_CACHE("getCache");
 
   private String value;
 

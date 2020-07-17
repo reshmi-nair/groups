@@ -10,15 +10,15 @@ import org.sunbird.models.GroupResponse;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.GroupService;
-import org.sunbird.service.impl.GroupServiceImpl;
+import org.sunbird.service.GroupServiceImpl;
 import org.sunbird.util.JsonKey;
 
 @ActorConfig(
   tasks = {"searchGroup"},
-  asyncTasks = {}
+  asyncTasks = {},
+  dispatcher = "group-dispatcher"
 )
 public class SearchGroupActor extends BaseActor {
-  private GroupService groupService = GroupServiceImpl.getInstance();
 
   @Override
   public void onReceive(Request request) throws Throwable {
@@ -40,6 +40,7 @@ public class SearchGroupActor extends BaseActor {
    */
   private void searchGroup(Request request) throws BaseException {
     logger.info("SearchGroup method call");
+    GroupService groupService = new GroupServiceImpl();
     Map<String, Object> searchQueryMap = request.getRequest();
     Map<String, Object> filterMap = (Map<String, Object>) searchQueryMap.get(JsonKey.FILTERS);
     List<GroupResponse> groupDetails = groupService.searchGroup(filterMap);

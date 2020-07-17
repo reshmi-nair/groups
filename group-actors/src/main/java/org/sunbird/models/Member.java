@@ -1,13 +1,11 @@
 package org.sunbird.models;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.io.Serializable;
+import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
 import org.sunbird.cassandraannotation.PartitioningKey;
-import org.sunbird.util.JsonKey;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,11 +17,17 @@ public class Member implements Serializable {
   @PartitioningKey() private String groupId;
   private String role;
   private String status;
+
   private Timestamp createdOn;
+
   private String createdBy;
+
   private Timestamp updatedOn;
+
   private String updatedBy;
+
   private Timestamp removedOn;
+
   private String removedBy;
 
   public Member() {}

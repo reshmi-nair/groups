@@ -17,7 +17,16 @@
             <artifactId>sb-actor</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.sunbird</groupId>
+            <artifactId>platform-cache</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${commons-collections4.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.sunbird</groupId>
             <artifactId>sb-utils</artifactId>

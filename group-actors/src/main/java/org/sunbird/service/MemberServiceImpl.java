@@ -1,4 +1,4 @@
-package org.sunbird.service.impl;
+package org.sunbird.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Timestamp;
@@ -12,13 +12,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.dao.MemberDao;
-import org.sunbird.dao.impl.MemberDaoImpl;
+import org.sunbird.dao.MemberDaoImpl;
 import org.sunbird.exception.BaseException;
 import org.sunbird.models.Member;
 import org.sunbird.models.MemberResponse;
 import org.sunbird.response.Response;
-import org.sunbird.service.MemberService;
-import org.sunbird.service.UserService;
 import org.sunbird.util.GroupUtil;
 import org.sunbird.util.JsonKey;
 
@@ -29,13 +27,6 @@ public class MemberServiceImpl implements MemberService {
   private static Logger logger = LoggerFactory.getLogger(MemberServiceImpl.class);
   private static ObjectMapper objectMapper = new ObjectMapper();
   private static UserService userService = UserServiceImpl.getInstance();
-
-  public static MemberService getInstance() {
-    if (memberService == null) {
-      memberService = new MemberServiceImpl();
-    }
-    return memberService;
-  }
 
   @Override
   public Response addMembers(List<Member> member) throws BaseException {
@@ -122,7 +113,6 @@ public class MemberServiceImpl implements MemberService {
       throws BaseException {
     Response response = memberDao.fetchMembersByGroupIds(groupIds, fields);
     List<MemberResponse> members = new ArrayList<>();
-
     if (null != response && null != response.getResult()) {
       List<Map<String, Object>> dbResMembers =
           (List<Map<String, Object>>) response.getResult().get(JsonKey.RESPONSE);
