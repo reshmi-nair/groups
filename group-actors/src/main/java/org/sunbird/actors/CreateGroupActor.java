@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
 import org.sunbird.models.Group;
@@ -14,6 +15,8 @@ import org.sunbird.service.GroupService;
 import org.sunbird.service.GroupServiceImpl;
 import org.sunbird.service.MemberService;
 import org.sunbird.service.MemberServiceImpl;
+import org.sunbird.telemetry.TelemetryEnvKey;
+import org.sunbird.telemetry.util.TelemetryUtil;
 import org.sunbird.util.GroupRequestHandler;
 import org.sunbird.util.JsonKey;
 
@@ -71,5 +74,29 @@ public class CreateGroupActor extends BaseActor {
     Response response = new Response();
     response.put(JsonKey.GROUP_ID, groupId);
     sender().tell(response, self());
+    String source =
+        actorMessage.getContext().get(JsonKey.REQUEST_SOURCE) != null
+            ? (String) actorMessage.getContext().get(JsonKey.REQUEST_SOURCE)
+            : "";
+
+    List<Map<String, Object>> correlatedObject = new ArrayList<>();
+    if (StringUtils.isNotBlank(source)) {
+      TelemetryUtil.generateCorrelatedObject(
+          source, StringUtils.capitalize(JsonKey.REQUEST_SOURCE), null, correlatedObject);
+    }
+    Map<String, Object> targetObject = null;
+    targetObject =
+        TelemetryUtil.generateTargetObject(
+            (String) actorMessage.getRequest().get(JsonKey.ID),
+            TelemetryEnvKey.USER,
+            JsonKey.CREATE,
+            null);
+    TelemetryUtil.generateCorrelatedObject(
+        (String) actorMessage.getContext().get(JsonKey.USER_ID),
+        TelemetryEnvKey.USER,
+        null,
+        correlatedObject);
+    TelemetryUtil.telemetryProcessingCall(
+        actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
   }
 }

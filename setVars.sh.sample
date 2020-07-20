@@ -20,7 +20,11 @@
 #sunbird_sso_publickey=''
 #sunbird_sso_realm='sunbird'
 #sunbird_sso_url=''
-
+#sunbird_us_system_setting_url=''
+#sunbird_us_org_read_url=''
+#sunbird_cs_search_url=''
 #admin util keys must be injected
-
+#telemetry_pdata_id=''
+#telemetry_pdata_pid=''
+#telemetry_pdata_ver=''
 ################### END - GROUPS_SERVICE configuration #############################

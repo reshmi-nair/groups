@@ -22,6 +22,7 @@ public class PropertiesCache {
     "dbconfig.properties",
     "externalresource.properties",
     "sso.properties",
+    "telemetry.config.properties"
   };
 
   private final Properties configProp = new Properties();
