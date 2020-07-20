@@ -1,12 +1,14 @@
 package org.sunbird.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 
 public class JsonUtils {
 
@@ -24,6 +26,10 @@ public class JsonUtils {
 
   public static <T> T deserialize(String value, Class<T> clazz) throws Exception {
     return mapper.readValue(value, clazz);
+  }
+
+  public static <T> T deserialize(String value, TypeReference<T> valueTypeRef) throws Exception {
+    return mapper.readValue(value, valueTypeRef);
   }
 
   public static <T> T deserialize(InputStream value, Class<T> clazz) throws Exception {

@@ -1,8 +1,6 @@
 package org.sunbird.actors;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
@@ -19,6 +17,11 @@ import org.sunbird.telemetry.util.TelemetryUtil;
 import org.sunbird.util.CacheUtil;
 import org.sunbird.util.GroupRequestHandler;
 import org.sunbird.util.JsonKey;
+import org.sunbird.util.helper.PropertiesCache;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @ActorConfig(
   tasks = {"updateGroup"},
@@ -56,6 +59,10 @@ public class UpdateGroupActor extends BaseActor {
     Map memberOperationMap = (Map) actorMessage.getRequest().get(JsonKey.MEMBERS);
     if (MapUtils.isNotEmpty(memberOperationMap)) {
       cacheUtil.delCache(group.getId() + "_" + JsonKey.MEMBERS);
+      boolean isUseridRedisEnabled = Boolean.parseBoolean(PropertiesCache.getInstance().getConfigValue(JsonKey.ENABLE_USERID_REDIS_CACHE));
+      if(isUseridRedisEnabled) {
+        deleteUserCache(memberOperationMap);
+      }
       memberService.handleMemberOperations(
           memberOperationMap, group.getId(), requestHandler.getRequestedBy(actorMessage));
     }
@@ -84,5 +91,28 @@ public class UpdateGroupActor extends BaseActor {
 
     TelemetryUtil.telemetryProcessingCall(
         actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
+  }
+
+  public void deleteUserCache( Map memberOperationMap){
+    List<Map<String, Object>> memberAddList =
+            (List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD);
+    if (CollectionUtils.isNotEmpty(memberAddList)) {
+      memberAddList.forEach(
+              member -> cacheUtil.delCache((String)(member.get(JsonKey.USER_ID)))
+      );
+    }
+    List<Map<String, Object>> memberEditList =
+            (List<Map<String, Object>>) memberOperationMap.get(JsonKey.EDIT);
+    if (CollectionUtils.isNotEmpty(memberEditList)) {
+      memberEditList.forEach(
+              member -> cacheUtil.delCache((String)(member.get(JsonKey.USER_ID)))
+      );
+    }
+    List<String> memberRemoveList = (List<String>) memberOperationMap.get(JsonKey.REMOVE);
+    if (CollectionUtils.isNotEmpty(memberRemoveList)) {
+      memberRemoveList.forEach(
+              member -> cacheUtil.delCache(member)
+      );
+    }
   }
 }

@@ -1,19 +1,11 @@
 package org.sunbird.actors;
 
-import static org.powermock.api.mockito.PowerMockito.doNothing;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
-
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -22,8 +14,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.Application;
-import org.sunbird.cache.impl.RedisCache;
 import org.sunbird.cassandra.CassandraOperation;
 import org.sunbird.cassandraimpl.CassandraOperationImpl;
 import org.sunbird.exception.BaseException;
@@ -34,14 +24,21 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.util.JsonKey;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
   CassandraOperation.class,
   CassandraOperationImpl.class,
   ServiceFactory.class,
-  Localizer.class,
-  Application.class,
-  RedisCache.class
+  Localizer.class
 })
 @PowerMockIgnore({"javax.management.*"})
 public class UpdateGroupActorTest extends BaseActorTest {
@@ -59,21 +56,6 @@ public class UpdateGroupActorTest extends BaseActorTest {
     cassandraOperation = mock(CassandraOperationImpl.class);
     when(ServiceFactory.getInstance()).thenReturn(cassandraOperation);
     mockCacheActor();
-  }
-
-  private void mockCacheActor() throws Exception {
-    ActorSystem actorSystem = ActorSystem.create("system");
-    Props props = Props.create(CacheActor.class);
-    ActorRef actorRef = actorSystem.actorOf(props);
-    Application app = PowerMockito.mock(Application.class);
-    PowerMockito.mockStatic(Application.class);
-    PowerMockito.when(Application.getInstance()).thenReturn(app);
-    PowerMockito.when(app.getActorRef(Mockito.anyString())).thenReturn(actorRef);
-    PowerMockito.mockStatic(RedisCache.class);
-    doNothing()
-        .when(RedisCache.class, "set", Mockito.anyString(), Mockito.anyString(), Mockito.anyInt());
-    doNothing().when(RedisCache.class, "delete", Mockito.anyObject());
-    when(RedisCache.get(Mockito.anyString(), Mockito.anyObject(), Mockito.anyInt())).thenReturn("");
   }
 
   @Test

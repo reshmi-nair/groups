@@ -3,12 +3,6 @@ package org.sunbird.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,11 +18,10 @@ import org.sunbird.models.Group;
 import org.sunbird.models.GroupResponse;
 import org.sunbird.models.MemberResponse;
 import org.sunbird.response.Response;
-import org.sunbird.util.ActivityConfigReader;
-import org.sunbird.util.GroupUtil;
-import org.sunbird.util.JsonKey;
-import org.sunbird.util.JsonUtils;
-import org.sunbird.util.SearchServiceUtil;
+import org.sunbird.util.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GroupServiceImpl implements GroupService {
   private static Logger logger = LoggerFactory.getLogger(GroupServiceImpl.class);
@@ -130,7 +123,6 @@ public class GroupServiceImpl implements GroupService {
   public List<GroupResponse> searchGroup(Map<String, Object> searchFilter) throws BaseException {
     List<GroupResponse> groups = new ArrayList<>();
     String userId = (String) searchFilter.get(JsonKey.USER_ID);
-    String groupId = (String) searchFilter.get(JsonKey.GROUP_ID);
     if (StringUtils.isNotBlank(userId)) {
       List<String> groupIds = fetchAllGroupIdsByUserId(userId);
       if (!groupIds.isEmpty()) {
@@ -139,11 +131,8 @@ public class GroupServiceImpl implements GroupService {
         GroupUtil.updateRoles(groups, groupRoleMap);
       }
 
-    } else if (StringUtils.isNotBlank(groupId)) {
-      List<String> groupIds = Lists.newArrayList(groupId);
-      groups = readGroupDetailsByGroupIds(groupIds);
-    } else {
-      logger.error("Bad Request userId or GroupId is Mandatory");
+   } else {
+      logger.error("Bad Request UserId is Mandatory");
       throw new BaseException(
           IResponseMessage.INVALID_REQUESTED_DATA,
           IResponseMessage.MISSING_MANDATORY_PARAMS,
