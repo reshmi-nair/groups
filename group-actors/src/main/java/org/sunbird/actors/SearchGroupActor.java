@@ -58,21 +58,17 @@ public class SearchGroupActor extends BaseActor {
     List<GroupResponse> groupDetails = new ArrayList<>();
     String userId = (String) filterMap.get(JsonKey.USER_ID);
     if (StringUtils.isNotBlank(userId)) {
-      boolean getFromDB = false;
+      boolean getFromDB = true;
       if(isUseridRedisEnabled) {
         String groupList = cacheUtil.getCache(userId);
         if (StringUtils.isNotEmpty(groupList)) {
           try {
             groupDetails = JsonUtils.deserialize(groupList, new TypeReference<List<GroupResponse>>() {});
+            getFromDB = false;
           } catch (Exception e) {
             logger.error("Error in getting group list from Redis: {}", e.getMessage());
-            getFromDB = true;
           }
-        } else {
-          getFromDB = true;
         }
-      }else {
-        getFromDB = true;
       }
       if (getFromDB || CollectionUtils.isEmpty(groupDetails)){
         groupDetails = groupService.searchGroup(filterMap);
