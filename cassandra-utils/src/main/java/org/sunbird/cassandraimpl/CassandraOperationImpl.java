@@ -1186,6 +1186,35 @@ public abstract class CassandraOperationImpl implements CassandraOperation {
     return response;
   }
 
+  @Override
+  public Response executeSelectQuery(
+      String keyspaceName,
+      String tableName,
+      Map<String, Object> propertyMap,
+      Builder selectBuilder) {
+    Response response;
+    Select selectQuery = selectBuilder.from(keyspaceName, tableName);
+    if (MapUtils.isNotEmpty(propertyMap)) {
+      Where selectWhere = selectQuery.where();
+      for (Entry<String, Object> entry : propertyMap.entrySet()) {
+        if (entry.getValue() instanceof List) {
+          List<Object> list = (List) entry.getValue();
+          if (null != list) {
+            Object[] propertyValues = list.toArray(new Object[list.size()]);
+            Clause clause = QueryBuilder.in(entry.getKey(), propertyValues);
+            selectWhere.and(clause);
+          }
+        } else {
+          Clause clause = eq(entry.getKey(), entry.getValue());
+          selectWhere.and(clause);
+        }
+      }
+    }
+    ResultSet results = connectionManager.getSession(keyspaceName).execute(selectQuery);
+    response = CassandraUtil.createResponse(results);
+    return response;
+  }
+
   protected String getLocalizedMessage(String key, Locale locale) {
     return localizer.getMessage(key, locale);
   }

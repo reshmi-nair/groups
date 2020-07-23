@@ -1,8 +1,10 @@
 package org.sunbird.actors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.message.ResponseCode;
@@ -40,31 +42,35 @@ public class ReadGroupActor extends BaseActor {
    * @param actorMessage
    */
   private void readGroup(Request actorMessage) throws Exception {
-    logger.info("ReadGroup method call");
     CacheUtil cacheUtil = new CacheUtil();
     GroupService groupService = new GroupServiceImpl();
     String groupId = (String) actorMessage.getRequest().get(JsonKey.GROUP_ID);
     List<String> requestFields = (List<String>) actorMessage.getRequest().get(JsonKey.FIELDS);
+    logger.info("Reading group with groupId {} and required fields {}", groupId, requestFields);
     GroupResponse groupResponse;
     String groupInfo = cacheUtil.getCache(groupId);
     if (StringUtils.isNotEmpty(groupInfo)) {
       groupResponse = JsonUtils.deserialize(groupInfo, GroupResponse.class);
     } else {
       groupResponse = groupService.readGroup(groupId);
-      cacheUtil.setCache(groupId, JsonUtils.serialize(groupResponse));
+      cacheUtil.setCache(groupId, JsonUtils.serialize(groupResponse), CacheUtil.groupTtl);
     }
-    if (requestFields.contains(JsonKey.MEMBERS)) {
+    if (CollectionUtils.isNotEmpty(requestFields) && requestFields.contains(JsonKey.MEMBERS)) {
       String groupMember = cacheUtil.getCache(constructRedisIdentifier(groupId));
       List<MemberResponse> memberResponses = new ArrayList<>();
       if (StringUtils.isNotEmpty(groupMember)) {
-        memberResponses = JsonUtils.deserialize(groupMember, memberResponses.getClass());
+        memberResponses =
+            JsonUtils.deserialize(groupMember, new TypeReference<List<MemberResponse>>() {});
       } else {
         memberResponses = groupService.readGroupMembers(groupId);
-        cacheUtil.setCache(constructRedisIdentifier(groupId), JsonUtils.serialize(memberResponses));
+        cacheUtil.setCache(
+            constructRedisIdentifier(groupId),
+            JsonUtils.serialize(memberResponses),
+            CacheUtil.groupTtl);
       }
       groupResponse.setMembers(memberResponses);
     }
-    if (!requestFields.contains(JsonKey.ACTIVITIES)) {
+    if (CollectionUtils.isNotEmpty(requestFields) && !requestFields.contains(JsonKey.ACTIVITIES)) {
       groupResponse.setActivities(null);
     }
     Response response = new Response(ResponseCode.OK.getCode());

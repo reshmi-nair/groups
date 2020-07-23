@@ -43,7 +43,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
         onReceive(request);
         endTrace(operation);
       } catch (Exception e) {
-        logger.error("{} : message : {} {}", operation, e.getMessage(), e);
+        logger.error("{} exception occurred {} {}", operation, e.getMessage(), e);
         onReceiveException(operation, e);
       } finally {
         logger.clearMDC();
@@ -112,7 +112,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
    * @param tag
    */
   public void startTrace(String tag) {
-    logger.info(String.format("%s started at %s", tag, getTimeStamp()));
+    logger.info(String.format("operation %s started at %s", tag, getTimeStamp()));
   }
 
   /**
@@ -121,6 +121,6 @@ public abstract class BaseActor extends UntypedAbstractActor {
    * @param tag
    */
   public void endTrace(String tag) {
-    logger.info(String.format("%s ended at %s", tag, getTimeStamp()));
+    logger.info(String.format("operation %s ended at %s", tag, getTimeStamp()));
   }
 }

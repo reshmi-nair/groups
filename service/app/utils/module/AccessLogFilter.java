@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.sunbird.telemetry.util.TelemetryEvents;
 import org.sunbird.telemetry.util.TelemetryWriter;
 import org.sunbird.util.JsonKey;
@@ -38,31 +39,35 @@ public class AccessLogFilter extends EssentialFilter {
           Accumulator<ByteString, Result> accumulator = next.apply(request);
           return accumulator.map(
               result -> {
-                try {
-                  long endTime = System.currentTimeMillis();
-                  long requestTime = endTime - startTime;
-                  org.sunbird.request.Request req = new org.sunbird.request.Request();
-                  Map<String, Object> params = new WeakHashMap<>();
-                  params.put(JsonKey.URL, request.uri());
-                  params.put(JsonKey.LOG_TYPE, JsonKey.API_ACCESS);
-                  params.put(JsonKey.MESSAGE, "");
-                  params.put(JsonKey.METHOD, request.method());
-                  params.put(JsonKey.DURATION, requestTime);
-                  params.put(JsonKey.STATUS, result.status());
-                  params.put(JsonKey.LOG_LEVEL, JsonKey.INFO);
-                  String contextDetails = request.flash().get(JsonKey.CONTEXT);
-                  Map<String, Object> context =
-                      objectMapper.readValue(
-                          contextDetails, new TypeReference<Map<String, Object>>() {});
-                  req.setRequest(
-                      generateTelemetryRequestForController(
-                          TelemetryEvents.LOG.getName(),
-                          params,
-                          (Map<String, Object>) context.get(JsonKey.CONTEXT)));
-                  TelemetryWriter.write(req);
-                } catch (Exception ex) {
-                  logger.info("AccessLogFilter:apply Exception in writing telemetry", ex);
+                if (!(request.uri().contains("/health")
+                    || request.uri().contains("/service/health"))) {
+                  try {
+                    long endTime = System.currentTimeMillis();
+                    long requestTime = endTime - startTime;
+                    org.sunbird.request.Request req = new org.sunbird.request.Request();
+                    Map<String, Object> params = new WeakHashMap<>();
+                    params.put(JsonKey.URL, request.uri());
+                    params.put(JsonKey.LOG_TYPE, JsonKey.API_ACCESS);
+                    params.put(JsonKey.MESSAGE, "");
+                    params.put(JsonKey.METHOD, request.method());
+                    params.put(JsonKey.DURATION, requestTime);
+                    params.put(JsonKey.STATUS, result.status());
+                    params.put(JsonKey.LOG_LEVEL, JsonKey.INFO);
+                    String contextDetails = request.flash().get(JsonKey.CONTEXT);
+                    Map<String, Object> context =
+                        objectMapper.readValue(
+                            contextDetails, new TypeReference<Map<String, Object>>() {});
+                    req.setRequest(
+                        generateTelemetryRequestForController(
+                            TelemetryEvents.LOG.getName(),
+                            params,
+                            (Map<String, Object>) context.get(JsonKey.CONTEXT)));
+                    TelemetryWriter.write(req);
+                  } catch (Exception ex) {
+                    logger.info("AccessLogFilter:apply Exception in writing telemetry", ex);
+                  }
                 }
+                MDC.clear();
                 return result;
               },
               executor);

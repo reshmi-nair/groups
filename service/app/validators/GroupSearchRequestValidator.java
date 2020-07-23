@@ -14,9 +14,7 @@ public class GroupSearchRequestValidator implements validators.IRequestValidator
 
   @Override
   public boolean validate(Request request) throws BaseException {
-    logger.info(
-        "GroupSearchRequestValidator:started validating the request with request"
-            + request.getRequest());
+    logger.info("Validating the search group request {}", request.getRequest());
     validators.ValidationUtil.validateRequestObject(request);
     validators.ValidationUtil.validateMandatoryParamsWithType(
         request.getRequest(),

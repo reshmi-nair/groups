@@ -27,4 +27,6 @@
 #telemetry_pdata_id=''
 #telemetry_pdata_pid=''
 #telemetry_pdata_ver=''
+#max_group_members_limit=''
+#max_activity_limit=''
 ################### END - GROUPS_SERVICE configuration #############################

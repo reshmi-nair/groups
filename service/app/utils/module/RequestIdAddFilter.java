@@ -8,7 +8,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.sunbird.util.JsonKey;
 import play.mvc.Filter;
 import play.mvc.Http;
@@ -26,13 +25,10 @@ public class RequestIdAddFilter extends Filter {
   public CompletionStage<Result> apply(
       Function<Http.RequestHeader, CompletionStage<Result>> nextFilter,
       Http.RequestHeader requestHeader) {
-    long startTime = System.currentTimeMillis();
-
     Optional<String> requestIdHeader = requestHeader.getHeaders().get(JsonKey.REQUEST_MESSAGE_ID);
     String reqId =
         requestIdHeader.isPresent() ? requestIdHeader.get() : UUID.randomUUID().toString();
     requestHeader.getHeaders().addHeader(JsonKey.REQUEST_MESSAGE_ID, reqId);
-    MDC.put(JsonKey.REQUEST_MESSAGE_ID, reqId);
     return nextFilter.apply(requestHeader);
   }
 }

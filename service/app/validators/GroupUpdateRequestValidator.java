@@ -19,9 +19,7 @@ public class GroupUpdateRequestValidator implements IRequestValidator {
 
   @Override
   public boolean validate(Request request) throws BaseException {
-    logger.info(
-        "GroupUpdateRequestValidator:started validating the request with request"
-            + request.getRequest());
+    logger.info("Validating the update group request {}", request.getRequest());
     ValidationUtil.validateRequestObject(request);
     ValidationUtil.validateMandatoryParamsWithType(
         request.getRequest(),

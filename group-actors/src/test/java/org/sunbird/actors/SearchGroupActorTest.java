@@ -7,7 +7,12 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +49,7 @@ public class SearchGroupActorTest extends BaseActorTest {
     PowerMockito.mockStatic(ServiceFactory.class);
     cassandraOperation = mock(CassandraOperationImpl.class);
     when(ServiceFactory.getInstance()).thenReturn(cassandraOperation);
+    mockCacheActor();
   }
 
   @Test
@@ -103,10 +109,11 @@ public class SearchGroupActorTest extends BaseActorTest {
     Map<String, Object> group1 = new HashMap<>();
     group1.put("name", "TestGroup1");
     group1.put("id", "groupid1");
-
+    group1.put(JsonKey.STATUS, JsonKey.ACTIVE);
     Map<String, Object> group2 = new HashMap<>();
     group2.put("name", "TestGroup2");
     group2.put("id", "groupid2");
+    group1.put(JsonKey.STATUS, JsonKey.ACTIVE);
     groupList.add(group1);
     groupList.add(group2);
     result.put(JsonKey.RESPONSE, groupList);

@@ -2,6 +2,7 @@
 package org.sunbird.cassandra;
 
 import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.querybuilder.Select.Builder;
 import com.google.common.util.concurrent.FutureCallback;
 import java.util.List;
 import java.util.Map;
@@ -502,5 +503,9 @@ public interface CassandraOperation {
 
   public Response updateRemoveSetRecord(
       String keySpace, String table, Map<String, Object> primaryKey, String column, Object value)
+      throws BaseException;
+
+  public Response executeSelectQuery(
+      String keyspaceName, String tableName, Map<String, Object> properties, Builder selectBuilder)
       throws BaseException;
 }

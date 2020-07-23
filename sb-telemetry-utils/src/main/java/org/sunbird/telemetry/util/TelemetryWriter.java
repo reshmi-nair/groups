@@ -37,10 +37,7 @@ public class TelemetryWriter {
       }
     } catch (Exception ex) {
       logger.error(
-          "TelemetryWriter:write: Exception occurred while writting telemetry: "
-              + " exception = "
-              + ex,
-          LoggerEnum.ERROR.name());
+          "Exception occurred while writing telemetry: {} {}", ex, LoggerEnum.ERROR.name());
     }
   }
 
@@ -52,7 +49,7 @@ public class TelemetryWriter {
       telemetryEventLogger.info(telemetry);
     } else {
       logger.error(
-          "TelemetryWriter:processLogEvent: Audit Telemetry validation failed: ",
+          "processLogEvent: Audit Telemetry validation failed: {} {} ",
           telemetry,
           LoggerEnum.ERROR.name());
     }
@@ -65,10 +62,7 @@ public class TelemetryWriter {
     if (StringUtils.isNotBlank(telemetry) && telemetryObjectValidator.validateError(telemetry)) {
       telemetryEventLogger.info(telemetry);
     } else {
-      logger.error(
-          "TelemetryWriter:processLogEvent: Error Telemetry validation failed: ",
-          telemetry,
-          LoggerEnum.ERROR.name());
+      logger.error("processLogEvent: Error Telemetry validation failed: {}", telemetry);
     }
   }
 
@@ -79,10 +73,7 @@ public class TelemetryWriter {
     if (StringUtils.isNotBlank(telemetry) && telemetryObjectValidator.validateSearch(telemetry)) {
       telemetryEventLogger.info(telemetry);
     } else {
-      logger.error(
-          "TelemetryWriter:processLogEvent: Search Telemetry validation failed: ",
-          telemetry,
-          LoggerEnum.ERROR.name());
+      logger.error("processLogEvent: Search Telemetry validation failed: {} ", telemetry);
     }
   }
 
@@ -98,10 +89,7 @@ public class TelemetryWriter {
     if (StringUtils.isNotBlank(telemetry) && telemetryObjectValidator.validateAudit(telemetry)) {
       telemetryEventLogger.info(telemetry);
     } else {
-      logger.error(
-          "TelemetryWriter:processLogEvent: Audit Telemetry validation failed: ",
-          telemetry,
-          LoggerEnum.ERROR.name());
+      logger.error("processLogEvent: Audit Telemetry validation failed: {}", telemetry);
     }
   }
 }

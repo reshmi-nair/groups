@@ -5,10 +5,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sunbird.exception.BaseException;
+import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.models.GroupResponse;
 
 public class GroupUtil {
 
+  private static Logger logger = LoggerFactory.getLogger(GroupUtil.class);
   /**
    * Update Role details in the group of a user
    *
@@ -54,5 +60,25 @@ public class GroupUtil {
       }
     }
     return idClassTypeMap;
+  }
+
+  public static void checkMaxActivityLimit(Integer totalActivityCount) {
+    if (totalActivityCount > SystemConfigUtil.getMaxActivityLimit()) {
+      logger.error("List of activities exceeded the activity size limit:{}", totalActivityCount);
+      throw new BaseException(
+          IResponseMessage.EXCEEDED_MAX_LIMIT,
+          IResponseMessage.Message.EXCEEDED_ACTIVITY_MAX_LIMIT,
+          ResponseCode.CLIENT_ERROR.getCode());
+    }
+  }
+
+  public static void checkMaxMemberLimit(int totalMemberCount) {
+    if (totalMemberCount > SystemConfigUtil.getMaxGroupMemberLimit()) {
+      logger.error("List of members exceeded the member size limit:{}", totalMemberCount);
+      throw new BaseException(
+          IResponseMessage.EXCEEDED_MAX_LIMIT,
+          IResponseMessage.Message.EXCEEDED_MEMBER_MAX_LIMIT,
+          ResponseCode.CLIENT_ERROR.getCode());
+    }
   }
 }

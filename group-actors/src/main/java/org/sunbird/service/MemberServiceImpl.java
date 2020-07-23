@@ -23,7 +23,6 @@ import org.sunbird.util.JsonKey;
 public class MemberServiceImpl implements MemberService {
 
   private static MemberDao memberDao = MemberDaoImpl.getInstance();
-  private static MemberService memberService = null;
   private static Logger logger = LoggerFactory.getLogger(MemberServiceImpl.class);
   private static ObjectMapper objectMapper = new ObjectMapper();
   private static UserService userService = UserServiceImpl.getInstance();
@@ -65,6 +64,8 @@ public class MemberServiceImpl implements MemberService {
               .map(data -> getMemberModelForEdit(data, groupId, contextUserId))
               .collect(Collectors.toList());
       if (!editMembers.isEmpty()) {
+        logger.info(
+            "Number of members to be modified in the group {} are {}", groupId, editMembers.size());
         Response editMemberRes = editMembers(editMembers);
       }
     }
@@ -76,6 +77,10 @@ public class MemberServiceImpl implements MemberService {
               .map(data -> getMemberModelForRemove(data, groupId, contextUserId))
               .collect(Collectors.toList());
       if (!removeMembers.isEmpty()) {
+        logger.info(
+            "Number of members needs to be removed from the group {} are {}",
+            groupId,
+            removeMembers.size());
         Response removeMemberRes = removeMembers(removeMembers);
       }
     }
@@ -85,7 +90,7 @@ public class MemberServiceImpl implements MemberService {
   public Response handleMemberAddition(
       List<Map<String, Object>> memberList, String groupId, String contextUserId)
       throws BaseException {
-    logger.info("Number of members to be added are: {}", memberList.size());
+    logger.info("Number of members to be added to the group {} are {}", groupId, memberList.size());
     Response addMemberRes = new Response();
     List<Member> members =
         memberList
@@ -187,6 +192,20 @@ public class MemberServiceImpl implements MemberService {
       }
     }
     return groupRoleMap;
+  }
+
+  @Override
+  public Integer fetchMemberSize(String groupId) throws BaseException {
+
+    Response response = memberDao.fetchMemberSize(groupId);
+    if (null != response && null != response.getResult()) {
+      List<Map<String, Object>> dbResponse =
+          (List<Map<String, Object>>) response.getResult().get(JsonKey.RESPONSE);
+      if (null != dbResponse) {
+        return ((Long) dbResponse.get(0).get(JsonKey.COUNT)).intValue();
+      }
+    }
+    return 0;
   }
 
   private Member getMemberModelForAdd(

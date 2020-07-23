@@ -28,12 +28,10 @@ public class KeyManager {
       int keyCount =
           Integer.parseInt(propertiesCache.getProperty(JsonKey.ACCESS_TOKEN_PUBLICKEY_KEYCOUNT));
       logger.info(
-          "KeyManager:init: basePath: "
-              + basePath
-              + " keyPrefix: "
-              + keyPrefix
-              + " keys count: "
-              + keyCount);
+          "KeyManager:init: basePath: {} keyPrefix: {} keys count: {}",
+          basePath,
+          keyPrefix,
+          keyCount);
       for (int i = 1; i <= keyCount; i++) {
         String keyId = keyPrefix + i;
         keyMap.put(keyId, new KeyData(keyId, loadPublicKey(basePath + keyId)));

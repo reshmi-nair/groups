@@ -175,9 +175,7 @@ public class HttpClientUtil {
         HttpEntity httpEntity = response.getEntity();
         byte[] bytes = EntityUtils.toByteArray(httpEntity);
         StatusLine sl = response.getStatusLine();
-        logger.info(
-            "Response from post call : " + sl.getStatusCode() + " - " + sl.getReasonPhrase(),
-            LoggerEnum.INFO.name());
+        logger.info("Response from post call : {} - {}", sl.getStatusCode(), sl.getReasonPhrase());
         return new String(bytes);
       } else {
         return "";
@@ -215,8 +213,7 @@ public class HttpClientUtil {
         byte[] bytes = EntityUtils.toByteArray(httpEntity);
         StatusLine sl = response.getStatusLine();
         logger.error(
-            "Response from patch call : " + sl.getStatusCode() + " - " + sl.getReasonPhrase(),
-            LoggerEnum.INFO.name());
+            "Response from patch call : {} - {} ", sl.getStatusCode(), sl.getReasonPhrase());
         return new String(bytes);
       } else {
         return "";

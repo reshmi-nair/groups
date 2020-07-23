@@ -16,4 +16,6 @@ public interface MemberDao {
   Response fetchGroupRoleByUser(List<String> groupIds, String userId) throws BaseException;
 
   Response removeMemberFromUserGroup(List<Member> member) throws BaseException;
+
+  Response fetchMemberSize(String groupId) throws BaseException;
 }

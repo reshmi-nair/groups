@@ -12,6 +12,7 @@ import java.util.concurrent.CompletionStage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -41,6 +42,11 @@ public class OnRequestHandler implements ActionCreator {
       @Override
       public CompletionStage<Result> call(Http.Request request) {
         request.getHeaders();
+        if (request.getHeaders().get(JsonKey.REQUEST_MESSAGE_ID).isPresent()) {
+          MDC.put(
+              JsonKey.REQUEST_MESSAGE_ID,
+              request.getHeaders().get(JsonKey.REQUEST_MESSAGE_ID).get());
+        }
         CompletionStage<Result> result = checkForServiceHealth(request);
         if (result != null) return result;
         request.flash().put(JsonKey.USER_ID, null);
@@ -105,7 +111,7 @@ public class OnRequestHandler implements ActionCreator {
    * @param httpReq
    * @param userId
    */
-  private void initializeContext(Http.Request httpReq, String userId) {
+  void initializeContext(Http.Request httpReq, String userId) {
     try {
       Map<String, Object> requestContext = new WeakHashMap<>();
       String env = getEnv(httpReq);
@@ -131,7 +137,7 @@ public class OnRequestHandler implements ActionCreator {
       if (optionalDeviceId.isPresent()) {
         requestContext.put(JsonKey.DEVICE_ID, optionalDeviceId.get());
       }
-      if (null != userId) {
+      if (null != userId && !JsonKey.USER_UNAUTH_STATES.contains(userId)) {
         requestContext.put(JsonKey.ACTOR_ID, userId);
         requestContext.put(JsonKey.ACTOR_TYPE, StringUtils.capitalize(JsonKey.USER));
       } else {
@@ -195,7 +201,7 @@ public class OnRequestHandler implements ActionCreator {
     String uri = request.uri();
     String env = "";
     if (uri.startsWith("/v1/group")) {
-      env = JsonKey.USER;
+      env = JsonKey.GROUP;
     }
     return env;
   }

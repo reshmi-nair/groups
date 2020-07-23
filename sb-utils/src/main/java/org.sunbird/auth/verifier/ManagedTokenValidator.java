@@ -33,21 +33,18 @@ public class ManagedTokenValidator {
       Map<Object, Object> headerData =
           mapper.readValue(new String(decodeFromBase64(header)), Map.class);
       String keyId = headerData.get("kid").toString();
-      logger.info("ManagedTokenValidator:verify: keyId: " + keyId);
+      logger.info("ManagedTokenValidator:verify: keyId: {}", keyId);
       Map<String, String> tokenBody =
           mapper.readValue(new String(decodeFromBase64(body)), Map.class);
       String parentId = tokenBody.get(JsonKey.PARENT_ID);
       String muaId = tokenBody.get(JsonKey.SUB);
       logger.info(
-          "ManagedTokenValidator: parent uuid: "
-              + parentId
-              + " managedBy uuid: "
-              + muaId
-              + " requestedByUserID: "
-              + requestedByUserId
-              + " requestedForUserId: "
-              + requestedForUserId);
-      logger.info("ManagedTokenValidator: key modified value: " + keyId);
+          "ManagedTokenValidator: parent uuid: {} managedBy uuid: {} requestedByUserID: {}  requestedForUserId: {}",
+          parentId,
+          muaId,
+          requestedByUserId,
+          requestedForUserId);
+      logger.info("ManagedTokenValidator: key modified value: {}", keyId);
       isValid =
           CryptoUtil.verifyRSASign(
               payLoad,
@@ -61,22 +58,21 @@ public class ManagedTokenValidator {
         managedFor = muaId;
       }
     } catch (Exception ex) {
-      logger.error("Exception in ManagedTokenValidator: verify ", ex.getMessage());
+      logger.error("Exception in ManagedTokenValidator: verify {}", ex.getMessage());
     }
 
     return managedFor;
   }
 
   /**
-   * managedtoken is validated and requestedByUserID values are validated
-   * aganist the managedEncToken
+   * managedtoken is validated and requestedByUserID values are validated aganist the
+   * managedEncToken
    *
    * @param managedEncToken
    * @param requestedByUserId
    * @return
    */
-  public static String verify(
-          String managedEncToken, String requestedByUserId) {
+  public static String verify(String managedEncToken, String requestedByUserId) {
     boolean isValid = false;
     String managedFor = JsonKey.UNAUTHORIZED;
     try {
@@ -86,28 +82,26 @@ public class ManagedTokenValidator {
       String signature = tokenElements[2];
       String payLoad = header + JsonKey.DOT_SEPARATOR + body;
       Map<Object, Object> headerData =
-              mapper.readValue(new String(decodeFromBase64(header)), Map.class);
+          mapper.readValue(new String(decodeFromBase64(header)), Map.class);
       String keyId = headerData.get("kid").toString();
-      logger.info("ManagedTokenValidator: verify: keyId: " + keyId);
+      logger.info("ManagedTokenValidator: verify: keyId: {}", keyId);
       Map<String, String> tokenBody =
-              mapper.readValue(new String(decodeFromBase64(body)), Map.class);
+          mapper.readValue(new String(decodeFromBase64(body)), Map.class);
       String parentId = tokenBody.get(JsonKey.PARENT_ID);
       String muaId = tokenBody.get(JsonKey.SUB);
       logger.info(
-              "ManagedTokenValidator: parent uuid: "
-                      + parentId
-                      + " managedBy uuid: "
-                      + muaId
-                      + " requestedByUserID: "
-                      + requestedByUserId);
-      logger.info("ManagedTokenValidator: key modified value: " + keyId);
-      isValid = CryptoUtil.verifyRSASign(
-                      payLoad,
-                      decodeFromBase64(signature),
-                      KeyManager.getPublicKey(keyId).getPublicKey(),
-                      JsonKey.SHA_256_WITH_RSA);
-      isValid &=
-              parentId.equalsIgnoreCase(requestedByUserId);
+          "ManagedTokenValidator: parent uuid: {} managedBy uuid: {} requestedByUserID: {}",
+          parentId,
+          muaId,
+          requestedByUserId);
+      logger.info("ManagedTokenValidator: key modified value: {}", keyId);
+      isValid =
+          CryptoUtil.verifyRSASign(
+              payLoad,
+              decodeFromBase64(signature),
+              KeyManager.getPublicKey(keyId).getPublicKey(),
+              JsonKey.SHA_256_WITH_RSA);
+      isValid &= parentId.equalsIgnoreCase(requestedByUserId);
       if (isValid) {
         managedFor = muaId;
       }

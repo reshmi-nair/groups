@@ -23,6 +23,7 @@ public interface IResponseMessage {
   String SERVICE_UNAVAILABLE = "SERVICE UNAVAILABLE";
   String INVALID_PARAMETER_VALUE = "INVALID_PARAMETER_VALUE";
   String GROUP_NOT_FOUND = "GROUP_NOT_FOUND";
+  String EXCEEDED_MAX_LIMIT = "EXCEEDED_MAX_LIMIT";
 
   interface Key {
     String UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
@@ -34,5 +35,7 @@ public interface IResponseMessage {
     String UNAUTHORIZED_USER = "You are not authorized.";
     String KEY_CLOAK_DEFAULT_ERROR = "server error at sso.";
     String UNABLE_TO_COMMUNICATE_WITH_ACTOR = "Unable to communicate with actor.";
+    String EXCEEDED_MEMBER_MAX_LIMIT = "Exceeded the member max size limit";
+    String EXCEEDED_ACTIVITY_MAX_LIMIT = "Exceeded the activity max size limit";
   }
 }

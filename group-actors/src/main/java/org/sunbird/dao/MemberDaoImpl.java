@@ -1,5 +1,7 @@
 package org.sunbird.dao;
 
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select.Builder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -46,7 +48,9 @@ public class MemberDaoImpl implements MemberDao {
   }
 
   private Response updateUserGroupTable(List<Map<String, Object>> memberList) throws BaseException {
-    logger.info("User Group table updation started ");
+    logger.info(
+        "User Group table updation started for the group id {}",
+        memberList.get(0).get(JsonKey.GROUP_ID));
     Response response = null;
     for (Map<String, Object> member : memberList) {
       Map<String, Object> primaryKey = new HashMap<>();
@@ -103,7 +107,8 @@ public class MemberDaoImpl implements MemberDao {
               member.get(JsonKey.GROUP_ID));
     }
     logger.info(
-        "members removed successfully from the user group table : response {}",
+        "{} members removed successfully from the user group table : response {}",
+        memberList.size(),
         response.getResult());
     return response;
   }
@@ -113,8 +118,6 @@ public class MemberDaoImpl implements MemberDao {
       throws BaseException {
     Map<String, Object> properties = new HashMap<>();
     properties.put(JsonKey.GROUP_ID, groupIds);
-    properties.put(JsonKey.STATUS, JsonKey.ACTIVE);
-
     Response responseObj =
         cassandraOperation.getRecordsByProperties(
             DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties, fields);
@@ -130,5 +133,17 @@ public class MemberDaoImpl implements MemberDao {
         cassandraOperation.getRecordsByProperties(
             DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties);
     return responseObj;
+  }
+
+  @Override
+  public Response fetchMemberSize(String groupId) throws BaseException {
+    Map<String, Object> properties = new HashMap<>();
+    properties.put(JsonKey.GROUP_ID, groupId);
+    properties.put(JsonKey.STATUS, JsonKey.ACTIVE);
+    Builder selectQueryBuilder = QueryBuilder.select().countAll();
+    Response response =
+        cassandraOperation.executeSelectQuery(
+            DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties, selectQueryBuilder);
+    return response;
   }
 }

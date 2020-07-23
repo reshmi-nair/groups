@@ -142,7 +142,7 @@ public class TelemetryGenerator {
           .flatMap(List::stream)
           .collect(Collectors.toList());
     } catch (Exception e) {
-      logger.error("TelemetryGenerator:getProps error =" + e, LoggerEnum.ERROR.name());
+      logger.error("getProps error = {} {} ", e, LoggerEnum.ERROR.name());
     }
     return new ArrayList<>();
   }
@@ -181,11 +181,11 @@ public class TelemetryGenerator {
     String event = "";
     try {
       event = mapper.writeValueAsString(telemetry);
-      logger.debug(
-          "TelemetryGenerator:getTelemetry = Telemetry Event : " + event, LoggerEnum.DEBUG.name());
+      logger.debug("getTelemetry = Telemetry Event :{} {} ", event, LoggerEnum.DEBUG.name());
     } catch (Exception e) {
       logger.error(
-          "TelemetryGenerator:getTelemetry = Telemetry Event: failed to generate audit events:" + e,
+          "getTelemetry = Telemetry Event: failed to generate audit events: {} {}",
+          e,
           LoggerEnum.ERROR.name());
     }
     return event;

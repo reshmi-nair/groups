@@ -29,10 +29,9 @@ public class TelemetryObjectValidatorV3 implements TelemetryObjectValidator {
       validateAuditEventData(telemetryObj.getEdata(), missingFields);
       if (!missingFields.isEmpty()) {
         logger.error(
-            "Telemetry Object Creation Error for event : "
-                + TelemetryEvents.AUDIT.getName()
-                + "  missing required fields :"
-                + String.join(",", missingFields));
+            "Telemetry Object Creation Error for event : {} missing required fields {} ",
+            TelemetryEvents.AUDIT.getName(),
+            String.join(",", missingFields));
         validationSuccess = false;
       }
     } catch (IOException e) {
@@ -54,10 +53,9 @@ public class TelemetryObjectValidatorV3 implements TelemetryObjectValidator {
       validateSearchEventData(telemetryObj.getEdata(), missingFields);
       if (!missingFields.isEmpty()) {
         logger.error(
-            "Telemetry Object Creation Error for event : "
-                + TelemetryEvents.SEARCH.getName()
-                + "  missing required fields :"
-                + String.join(",", missingFields));
+            "Telemetry Object Creation Error for event : {} missing required fields : {}",
+            TelemetryEvents.SEARCH.getName(),
+            String.join(",", missingFields));
         validationSuccess = false;
       }
     } catch (IOException e) {
@@ -137,10 +135,9 @@ public class TelemetryObjectValidatorV3 implements TelemetryObjectValidator {
       validateLogEventData(telemetryObj.getEdata(), missingFields);
       if (!missingFields.isEmpty()) {
         logger.error(
-            "Telemetry Object Creation Error for event : "
-                + TelemetryEvents.LOG.getName()
-                + "  missing required fields :"
-                + String.join(",", missingFields));
+            "Telemetry Object Creation Error for event : {} missing required fields : {}",
+            TelemetryEvents.LOG.getName(),
+            String.join(",", missingFields));
         validationSuccess = false;
       }
     } catch (IOException e) {
@@ -179,10 +176,9 @@ public class TelemetryObjectValidatorV3 implements TelemetryObjectValidator {
       validateErrorEventData(telemetryObj.getEdata(), missingFields);
       if (!missingFields.isEmpty()) {
         logger.error(
-            "Telemetry Object Creation Error for event : "
-                + TelemetryEvents.ERROR.getName()
-                + "  missing required fields :"
-                + String.join(",", missingFields));
+            "Telemetry Object Creation Error for event : {} missing required fields : {}",
+            TelemetryEvents.ERROR.getName(),
+            String.join(",", missingFields));
         validationSuccess = false;
       }
     } catch (IOException e) {

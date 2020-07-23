@@ -27,4 +27,6 @@ public interface MemberService {
 
   Map<String, String> fetchGroupRoleByUser(List<String> groupIds, String userId)
       throws BaseException;
+
+  Integer fetchMemberSize(String groupId) throws BaseException;
 }
