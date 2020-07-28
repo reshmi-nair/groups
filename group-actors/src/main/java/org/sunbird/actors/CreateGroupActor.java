@@ -101,18 +101,13 @@ public class CreateGroupActor extends BaseActor {
     }
     Map<String, Object> targetObject = null;
     targetObject =
-        TelemetryUtil.generateTargetObject(
-            (String) actorMessage.getContext().get(JsonKey.USER_ID),
-            TelemetryEnvKey.USER,
-            JsonKey.CREATE,
-            null);
+        TelemetryUtil.generateTargetObject(groupId, TelemetryEnvKey.GROUP, JsonKey.CREATE, null);
 
     TelemetryUtil.generateCorrelatedObject(
         (String) actorMessage.getContext().get(JsonKey.USER_ID),
         TelemetryEnvKey.USER,
         null,
         correlatedObject);
-    TelemetryUtil.generateCorrelatedObject(groupId, TelemetryEnvKey.GROUP, null, correlatedObject);
     TelemetryUtil.telemetryProcessingCall(
         actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
   }

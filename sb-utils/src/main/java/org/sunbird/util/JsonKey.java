@@ -131,6 +131,7 @@ public interface JsonKey {
   String ADDITIONAL_INFO = "ADDITIONAL_INFO";
   String UPDATE = "update";
   String CREATE = "create";
+  String DELETE = "delete";
   String REQUEST_SOURCE = "source";
   String CHANNEL = "channel";
   String FIELD = "field";
@@ -145,4 +146,5 @@ public interface JsonKey {
   String TTL = "ttl";
   String GROUPS_REDIS_TTL = "groups_redis_ttl";
   String USER_REDIS_TTL = "user_redis_ttl";
+  String X_REQUEST_ID = "X-Request-ID";
 }

@@ -66,10 +66,15 @@ public class UpdateGroupActor extends BaseActor {
     sender().tell(response, self());
     Map<String, Object> targetObject = null;
     List<Map<String, Object>> correlatedObject = new ArrayList<>();
-    targetObject =
-        TelemetryUtil.generateTargetObject(
-            group.getId(), TelemetryEnvKey.GROUP, JsonKey.UPDATE, null);
-
+    if (null != group.getStatus() && JsonKey.INACTIVE.equals(group.getStatus())) {
+      targetObject =
+          TelemetryUtil.generateTargetObject(
+              group.getId(), TelemetryEnvKey.GROUP, JsonKey.DELETE, null);
+    } else {
+      targetObject =
+          TelemetryUtil.generateTargetObject(
+              group.getId(), TelemetryEnvKey.GROUP, JsonKey.UPDATE, null);
+    }
     TelemetryUtil.telemetryProcessingCall(
         actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
   }
