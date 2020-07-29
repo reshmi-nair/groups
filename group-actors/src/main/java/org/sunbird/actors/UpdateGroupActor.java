@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
+import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.models.Group;
 import org.sunbird.models.MemberResponse;
@@ -55,11 +57,22 @@ public class UpdateGroupActor extends BaseActor {
     Group group = requestHandler.handleUpdateGroupRequest(actorMessage);
     logger.info("Update group for the groupId {}", group.getId());
 
-    // member updates to group
-    handleMemberOperation(
-        group.getId(),
-        (Map) actorMessage.getRequest().get(JsonKey.MEMBERS),
-        requestHandler.getRequestedBy(actorMessage));
+    String userId = group.getUpdatedBy();
+    if(StringUtils.isEmpty(userId)){
+      throw new BaseException(
+              IResponseMessage.Key.UNAUTHORIZED_USER,
+              IResponseMessage.Message.UNAUTHORIZED_USER,
+              ResponseCode.CLIENT_ERROR.getCode());
+    }
+
+    Map responseMap = null;
+    if (MapUtils.isNotEmpty((Map) actorMessage.getRequest().get(JsonKey.MEMBERS))) {
+      // member updates to group
+      responseMap = handleMemberOperation(
+              group.getId(),
+              (Map) actorMessage.getRequest().get(JsonKey.MEMBERS),
+              requestHandler.getRequestedBy(actorMessage));
+    }
 
     // Group and activity updates
     handleGroupActivityOperation(
@@ -67,6 +80,9 @@ public class UpdateGroupActor extends BaseActor {
 
     Response response = new Response(ResponseCode.OK.getCode());
     response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
+    if(MapUtils.isNotEmpty(responseMap)){
+      response.put(JsonKey.ERROR, responseMap);
+    }
     sender().tell(response, self());
 
     logTelemetry(actorMessage, group);
@@ -87,41 +103,41 @@ public class UpdateGroupActor extends BaseActor {
     Response response = groupService.updateGroup(group);
   }
 
-  private void handleMemberOperation(String groupId, Map memberOperationMap, String requestedBy) {
-    if (MapUtils.isNotEmpty(memberOperationMap)) {
-      MemberService memberService = new MemberServiceImpl();
-      List<MemberResponse> membersInDB = memberService.fetchMembersByGroupId(groupId);
+  private Map handleMemberOperation(String groupId, Map memberOperationMap, String requestedBy) {
+    Map validationErrors = new HashMap<>();
+    List errorList = new ArrayList();
+    validationErrors.put("members",errorList);
 
-      Map validationErrors = new HashMap<>();
-      List errorList = new ArrayList();
-      validationErrors.put("members",errorList);
+    MemberService memberService = new MemberServiceImpl();
+    List<MemberResponse> membersInDB = memberService.fetchMembersByGroupId(groupId);
 
-      GroupRequestHandler requestHandler = new GroupRequestHandler();
-      //Validate Member Addition
-      if(CollectionUtils.isNotEmpty((List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD))) {
-        requestHandler.validateAddMembers(memberOperationMap, membersInDB, validationErrors);
-      }
-      //Validate Member Update
-      if(CollectionUtils.isNotEmpty((List<Map<String, Object>>) memberOperationMap.get(JsonKey.EDIT))) {
-        requestHandler.validateEditMembers(memberOperationMap, membersInDB, validationErrors);
-      }
-      //Validate Member Remove
-      if(CollectionUtils.isNotEmpty((List<String>) memberOperationMap.get(JsonKey.REMOVE))){
-        requestHandler.validateRemoveMembers(memberOperationMap,  membersInDB, validationErrors);
-      }
-      int totalMemberCount = totalMemberCount(memberOperationMap, membersInDB);
-      GroupUtil.checkMaxMemberLimit(totalMemberCount);
-
-      boolean isUseridRedisEnabled =
-          Boolean.parseBoolean(
-              PropertiesCache.getInstance().getConfigValue(JsonKey.ENABLE_USERID_REDIS_CACHE));
-      if (isUseridRedisEnabled) {
-        //Remove group list user cache from redis
-        deleteUserCache(memberOperationMap);
-      }
-      cacheUtil.delCache(groupId + "_" + JsonKey.MEMBERS);
-      memberService.handleMemberOperations(memberOperationMap, groupId, requestedBy);
+    GroupRequestHandler requestHandler = new GroupRequestHandler();
+    //Validate Member Addition
+    if(CollectionUtils.isNotEmpty((List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD))) {
+      requestHandler.validateAddMembers(memberOperationMap, membersInDB, validationErrors);
     }
+    //Validate Member Update
+    if(CollectionUtils.isNotEmpty((List<Map<String, Object>>) memberOperationMap.get(JsonKey.EDIT))) {
+      requestHandler.validateEditMembers(memberOperationMap, membersInDB, validationErrors);
+    }
+    //Validate Member Remove
+    if(CollectionUtils.isNotEmpty((List<String>) memberOperationMap.get(JsonKey.REMOVE))){
+      requestHandler.validateRemoveMembers(memberOperationMap,  membersInDB, validationErrors);
+    }
+    int totalMemberCount = totalMemberCount(memberOperationMap, membersInDB);
+    GroupUtil.checkMaxMemberLimit(totalMemberCount);
+
+    boolean isUseridRedisEnabled =
+        Boolean.parseBoolean(
+            PropertiesCache.getInstance().getConfigValue(JsonKey.ENABLE_USERID_REDIS_CACHE));
+    if (isUseridRedisEnabled) {
+      //Remove group list user cache from redis
+      deleteUserCache(memberOperationMap);
+    }
+    cacheUtil.delCache(groupId + "_" + JsonKey.MEMBERS);
+    memberService.handleMemberOperations(memberOperationMap, groupId, requestedBy);
+
+    return validationErrors;
   }
 
   private void deleteUserCache(Map memberOperationMap) {

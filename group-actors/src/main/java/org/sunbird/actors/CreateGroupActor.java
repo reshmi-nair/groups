@@ -8,6 +8,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
+import org.sunbird.message.IResponseMessage;
+import org.sunbird.message.ResponseCode;
 import org.sunbird.models.Group;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
@@ -17,7 +19,10 @@ import org.sunbird.service.MemberService;
 import org.sunbird.service.MemberServiceImpl;
 import org.sunbird.telemetry.TelemetryEnvKey;
 import org.sunbird.telemetry.util.TelemetryUtil;
-import org.sunbird.util.*;
+import org.sunbird.util.CacheUtil;
+import org.sunbird.util.GroupRequestHandler;
+import org.sunbird.util.GroupUtil;
+import org.sunbird.util.JsonKey;
 import org.sunbird.util.helper.PropertiesCache;
 
 @ActorConfig(
@@ -44,16 +49,23 @@ public class CreateGroupActor extends BaseActor {
    * @param actorMessage
    */
   private void createGroup(Request actorMessage) throws BaseException {
+    logger.info("In createGroup() actor");
     GroupService groupService = new GroupServiceImpl();
-    MemberService memberService = new MemberServiceImpl();
 
     GroupRequestHandler requestHandler = new GroupRequestHandler();
     Group group = requestHandler.handleCreateGroupRequest(actorMessage);
 
+    String userId = group.getCreatedBy();
+    if(StringUtils.isEmpty(userId)){
+      throw new BaseException(
+              IResponseMessage.Key.UNAUTHORIZED_USER,
+              IResponseMessage.Message.UNAUTHORIZED_USER,
+              ResponseCode.CLIENT_ERROR.getCode());
+    }
     // add creator of group to memberList as admin
     List<Map<String, Object>> memberList = new ArrayList<>();
     Map<String, Object> createdUser = new HashMap<>();
-    createdUser.put(JsonKey.USER_ID, requestHandler.getRequestedBy(actorMessage));
+    createdUser.put(JsonKey.USER_ID, userId);
     createdUser.put(JsonKey.ROLE, JsonKey.ADMIN);
     memberList.add(createdUser);
 
@@ -76,6 +88,7 @@ public class CreateGroupActor extends BaseActor {
       if (isUseridRedisEnabled) {
         deleteUserCache(memberList);
       }
+      MemberService memberService = new MemberServiceImpl();
       Response addMembersRes =
           memberService.handleMemberAddition(
               memberList, groupId, requestHandler.getRequestedBy(actorMessage));

@@ -127,6 +127,9 @@ public class UpdateGroupActorTest extends BaseActorTest {
   private static Request updateGroupReq() {
     Request reqObj = new Request();
     reqObj.setHeaders(headerMap);
+    Map<String, Object> context = new HashMap<>();
+    context.put(JsonKey.USER_ID,"user1");
+    reqObj.setContext(context);
     reqObj.setOperation(ActorOperations.UPDATE_GROUP.getValue());
     reqObj.getRequest().put(JsonKey.GROUP_NAME, "TestGroup Name1");
     Map<String, List<Map<String, Object>>> memberOpearations = new HashMap<>();
