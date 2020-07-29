@@ -2,10 +2,8 @@ package org.sunbird.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -104,11 +102,6 @@ public class GroupRequestHandler {
           //If records are in DB and newMemberAddList is empty, means all members to add are already existing
           memberOperationMap.put(JsonKey.ADD, new ArrayList<Map<String, Object>>());
         }
-      }else{
-        //Remove duplicates and Continue with existing list as no members exist in DB
-        Set deptSet = new HashSet<>();
-        memberAddList.removeIf(m -> !deptSet.add(m.get(JsonKey.USER_ID)));
-        memberOperationMap.put(JsonKey.ADD, newMemberAddList);
       }
     }
   }
@@ -146,9 +139,6 @@ public class GroupRequestHandler {
           //If records are in DB and newMemberEditList is empty, means all new members are not existing
           memberOperationMap.put(JsonKey.EDIT, new ArrayList<Map<String, Object>>());
         }
-      }else{
-        //If no members exist in DB, nothing to update
-        memberOperationMap.put(JsonKey.EDIT, new ArrayList<Map<String, Object>>());
       }
     }
   }
@@ -186,9 +176,6 @@ public class GroupRequestHandler {
           //If records are in DB and newMemberRemoveList is empty, means nothing to remove
           memberOperationMap.put(JsonKey.REMOVE, new ArrayList<Map<String, Object>>());
         }
-      }else{
-        //If no members exist in DB, nothing to remove
-        memberOperationMap.put(JsonKey.REMOVE, new ArrayList<Map<String, Object>>());
       }
     }
   }
