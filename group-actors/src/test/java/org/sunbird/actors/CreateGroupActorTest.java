@@ -1,5 +1,6 @@
 package org.sunbird.actors;
 
+import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import akka.actor.ActorRef;
@@ -47,8 +48,8 @@ import org.sunbird.util.helper.PropertiesCache;
 public class CreateGroupActorTest extends BaseActorTest {
 
   private final Props props = Props.create(CreateGroupActor.class);
-
   private static Request reqObj;
+  public static PropertiesCache propertiesCache;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -105,8 +106,10 @@ public class CreateGroupActorTest extends BaseActorTest {
     PowerMockito.mockStatic(SystemConfigUtil.class);
 
     PowerMockito.mockStatic(PropertiesCache.class);
-    when(PropertiesCache.getConfigValue(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
-    when(PropertiesCache.getConfigValue(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
+    propertiesCache = mock(PropertiesCache.class);
+    when(PropertiesCache.getInstance()).thenReturn(propertiesCache);
+    when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
+    when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
   }
 
   @Test

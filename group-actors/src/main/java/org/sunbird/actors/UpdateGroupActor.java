@@ -124,7 +124,7 @@ public class UpdateGroupActor extends BaseActor {
     if(CollectionUtils.isNotEmpty((List<String>) memberOperationMap.get(JsonKey.REMOVE))){
       requestHandler.validateRemoveMembers(memberOperationMap,  membersInDB, validationErrors);
     }
-    int totalMemberCount = totalMemberCount(memberOperationMap, membersInDB);
+    int totalMemberCount = GroupUtil.totalMemberCount(memberOperationMap, membersInDB);
     GroupUtil.checkMaxMemberLimit(totalMemberCount);
 
     boolean isUseridRedisEnabled =
@@ -155,21 +155,6 @@ public class UpdateGroupActor extends BaseActor {
     if (CollectionUtils.isNotEmpty(memberRemoveList)) {
       memberRemoveList.forEach(member -> cacheUtil.delCache(member));
     }
-  }
-
-  private int totalMemberCount(Map memberOperationMap, List<MemberResponse> membersInDB){
-    int totalMemberCount = (null != membersInDB ? membersInDB.size() : 0);
-
-    List<Map<String, Object>> memberAddList = (List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD);
-    if (CollectionUtils.isNotEmpty(memberAddList)) {
-      totalMemberCount =+ memberAddList.size();
-    }
-
-    List<Map<String, Object>> memberRemoveList = (List<Map<String, Object>>) memberOperationMap.get(JsonKey.REMOVE);
-    if (CollectionUtils.isNotEmpty(memberRemoveList)) {
-      totalMemberCount =- memberRemoveList.size();
-    }
-    return totalMemberCount;
   }
 
   private void logTelemetry(Request actorMessage, Group group){

@@ -51,7 +51,7 @@ public class UpdateGroupActorTest extends BaseActorTest {
   private final Props props = Props.create(UpdateGroupActor.class);
   private Logger logger = LoggerFactory.getLogger(UpdateGroupActorTest.class);
   public static CassandraOperation cassandraOperation;
-
+  public static PropertiesCache propertiesCache;
   @Before
   public void setUp() throws Exception {
     PowerMockito.mockStatic(Localizer.class);
@@ -64,8 +64,10 @@ public class UpdateGroupActorTest extends BaseActorTest {
 
     PowerMockito.mockStatic(SystemConfigUtil.class);
     PowerMockito.mockStatic(PropertiesCache.class);
-    when(PropertiesCache.getConfigValue(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
-    when(PropertiesCache.getConfigValue(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
+    propertiesCache = mock(PropertiesCache.class);
+    when(PropertiesCache.getInstance()).thenReturn(propertiesCache);
+    when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
+    when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
   }
 
   @Test
