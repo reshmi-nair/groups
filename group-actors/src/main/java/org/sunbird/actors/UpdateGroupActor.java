@@ -1,15 +1,16 @@
 package org.sunbird.actors;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.models.Group;
+import org.sunbird.models.MemberResponse;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.GroupService;
@@ -18,7 +19,10 @@ import org.sunbird.service.MemberService;
 import org.sunbird.service.MemberServiceImpl;
 import org.sunbird.telemetry.TelemetryEnvKey;
 import org.sunbird.telemetry.util.TelemetryUtil;
-import org.sunbird.util.*;
+import org.sunbird.util.CacheUtil;
+import org.sunbird.util.GroupRequestHandler;
+import org.sunbird.util.GroupUtil;
+import org.sunbird.util.JsonKey;
 import org.sunbird.util.helper.PropertiesCache;
 
 @ActorConfig(
@@ -64,102 +68,63 @@ public class UpdateGroupActor extends BaseActor {
     Response response = new Response(ResponseCode.OK.getCode());
     response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
     sender().tell(response, self());
-    Map<String, Object> targetObject = null;
-    List<Map<String, Object>> correlatedObject = new ArrayList<>();
-    if (null != group.getStatus() && JsonKey.INACTIVE.equals(group.getStatus())) {
-      targetObject =
-          TelemetryUtil.generateTargetObject(
-              group.getId(), TelemetryEnvKey.GROUP, JsonKey.DELETE, null);
-    } else {
-      targetObject =
-          TelemetryUtil.generateTargetObject(
-              group.getId(), TelemetryEnvKey.GROUP, JsonKey.UPDATE, null);
-    }
-    TelemetryUtil.telemetryProcessingCall(
-        actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
+
+    logTelemetry(actorMessage, group);
   }
 
   private void handleGroupActivityOperation(Group group, Map<String, Object> activityOperationMap) {
     GroupService groupService = new GroupServiceImpl();
     Integer totalActivityCount = 0;
     if (MapUtils.isNotEmpty(activityOperationMap)) {
-      String groupActivityCount =
-          cacheUtil.getCache(group.getId() + "_" + JsonKey.ACTIVITIES + "_" + JsonKey.COUNT);
-      List<Map<String, Object>> updateActivityList = new ArrayList<>();
-      if (StringUtils.isNotBlank(groupActivityCount)) {
-        totalActivityCount = Integer.parseInt(groupActivityCount);
-
-        List<Map<String, Object>> activityAddList =
-            (List<Map<String, Object>>) activityOperationMap.get(JsonKey.ADD);
-        List<String> activityRemoveList = (List<String>) activityOperationMap.get(JsonKey.REMOVE);
-
-        if (CollectionUtils.isNotEmpty(activityAddList)) {
-          totalActivityCount += activityAddList.size();
-        }
-        if (CollectionUtils.isNotEmpty(activityRemoveList)) {
-          totalActivityCount -= activityRemoveList.size();
-        }
-      } else {
-        updateActivityList =
+      List<Map<String, Object>> updateActivityList =
             groupService.handleActivityOperations(group.getId(), activityOperationMap);
         totalActivityCount = updateActivityList.size();
-      }
+
       GroupUtil.checkMaxActivityLimit(totalActivityCount);
-      cacheUtil.delCache(group.getId() + "_" + JsonKey.ACTIVITIES + "_" + JsonKey.COUNT);
       cacheUtil.delCache(group.getId());
       group.setActivities(updateActivityList);
     }
-
     Response response = groupService.updateGroup(group);
-
-    // update only when activity changes
-    if (MapUtils.isNotEmpty(activityOperationMap)) {
-      cacheUtil.setCache(
-          group.getId() + "_" + JsonKey.ACTIVITIES + "_" + JsonKey.COUNT,
-          String.valueOf(totalActivityCount),
-          CacheUtil.groupTtl);
-    }
   }
 
   private void handleMemberOperation(String groupId, Map memberOperationMap, String requestedBy) {
-
-    MemberService memberService = new MemberServiceImpl();
-
     if (MapUtils.isNotEmpty(memberOperationMap)) {
-      List<Map<String, Object>> memberAddList =
-          (List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD);
-      List<String> memberRemoveList = (List<String>) memberOperationMap.get(JsonKey.REMOVE);
-      String groupMemberCount =
-          cacheUtil.getCache(groupId + "_" + JsonKey.MEMBERS + "_" + JsonKey.COUNT);
-      Integer groupMemberCurrentCount;
-      if (StringUtils.isNotBlank(groupMemberCount)) {
-        groupMemberCurrentCount = Integer.parseInt(groupMemberCount);
-      } else {
-        groupMemberCurrentCount = memberService.fetchMemberSize(groupId);
-      }
-      int totalMemberCount =
-          groupMemberCurrentCount
-              + (null != memberAddList ? memberAddList.size() : 0)
-              - (null != memberRemoveList ? memberRemoveList.size() : 0);
+      MemberService memberService = new MemberServiceImpl();
+      List<MemberResponse> membersInDB = memberService.fetchMembersByGroupId(groupId);
 
+      Map validationErrors = new HashMap<>();
+      List errorList = new ArrayList();
+      validationErrors.put("members",errorList);
+
+      GroupRequestHandler requestHandler = new GroupRequestHandler();
+      //Validate Member Addition
+      if(CollectionUtils.isNotEmpty((List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD))) {
+        requestHandler.validateAddMembers(memberOperationMap, membersInDB, validationErrors);
+      }
+      //Validate Member Update
+      if(CollectionUtils.isNotEmpty((List<Map<String, Object>>) memberOperationMap.get(JsonKey.EDIT))) {
+        requestHandler.validateEditMembers(memberOperationMap, membersInDB, validationErrors);
+      }
+      //Validate Member Remove
+      if(CollectionUtils.isNotEmpty((List<String>) memberOperationMap.get(JsonKey.REMOVE))){
+        requestHandler.validateRemoveMembers(memberOperationMap,  membersInDB, validationErrors);
+      }
+      int totalMemberCount = totalMemberCount(memberOperationMap, membersInDB);
       GroupUtil.checkMaxMemberLimit(totalMemberCount);
+
       boolean isUseridRedisEnabled =
           Boolean.parseBoolean(
               PropertiesCache.getInstance().getConfigValue(JsonKey.ENABLE_USERID_REDIS_CACHE));
       if (isUseridRedisEnabled) {
+        //Remove group list user cache from redis
         deleteUserCache(memberOperationMap);
       }
-      cacheUtil.delCache(groupId + "_" + JsonKey.MEMBERS + "_" + JsonKey.COUNT);
       cacheUtil.delCache(groupId + "_" + JsonKey.MEMBERS);
       memberService.handleMemberOperations(memberOperationMap, groupId, requestedBy);
-      cacheUtil.setCache(
-          groupId + "_" + JsonKey.MEMBERS + "_" + JsonKey.COUNT,
-          String.valueOf(totalMemberCount),
-          CacheUtil.groupTtl);
     }
   }
 
-  public void deleteUserCache(Map memberOperationMap) {
+  private void deleteUserCache(Map memberOperationMap) {
     List<Map<String, Object>> memberAddList =
         (List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD);
     if (CollectionUtils.isNotEmpty(memberAddList)) {
@@ -175,4 +140,36 @@ public class UpdateGroupActor extends BaseActor {
       memberRemoveList.forEach(member -> cacheUtil.delCache(member));
     }
   }
+
+  private int totalMemberCount(Map memberOperationMap, List<MemberResponse> membersInDB){
+    int totalMemberCount = (null != membersInDB ? membersInDB.size() : 0);
+
+    List<Map<String, Object>> memberAddList = (List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD);
+    if (CollectionUtils.isNotEmpty(memberAddList)) {
+      totalMemberCount =+ memberAddList.size();
+    }
+
+    List<Map<String, Object>> memberRemoveList = (List<Map<String, Object>>) memberOperationMap.get(JsonKey.REMOVE);
+    if (CollectionUtils.isNotEmpty(memberRemoveList)) {
+      totalMemberCount =- memberRemoveList.size();
+    }
+    return totalMemberCount;
+  }
+
+  private void logTelemetry(Request actorMessage, Group group){
+    Map<String, Object> targetObject = null;
+    List<Map<String, Object>> correlatedObject = new ArrayList<>();
+    if (null != group.getStatus() && JsonKey.INACTIVE.equals(group.getStatus())) {
+      targetObject =
+              TelemetryUtil.generateTargetObject(
+                      group.getId(), TelemetryEnvKey.GROUP, JsonKey.DELETE, null);
+    } else {
+      targetObject =
+              TelemetryUtil.generateTargetObject(
+                      group.getId(), TelemetryEnvKey.GROUP, JsonKey.UPDATE, null);
+    }
+    TelemetryUtil.telemetryProcessingCall(
+            actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
+  }
+
 }

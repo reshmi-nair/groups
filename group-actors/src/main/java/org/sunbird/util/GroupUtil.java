@@ -11,6 +11,7 @@ import org.sunbird.exception.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.models.GroupResponse;
+import org.sunbird.util.helper.PropertiesCache;
 
 public class GroupUtil {
 
@@ -63,7 +64,7 @@ public class GroupUtil {
   }
 
   public static void checkMaxActivityLimit(Integer totalActivityCount) {
-    if (totalActivityCount > SystemConfigUtil.getMaxActivityLimit()) {
+    if (totalActivityCount > Integer.parseInt(PropertiesCache.getConfigValue(JsonKey.MAX_ACTIVITY_LIMIT))) {
       logger.error("List of activities exceeded the activity size limit:{}", totalActivityCount);
       throw new BaseException(
           IResponseMessage.EXCEEDED_MAX_LIMIT,
@@ -73,7 +74,7 @@ public class GroupUtil {
   }
 
   public static void checkMaxMemberLimit(int totalMemberCount) {
-    if (totalMemberCount > SystemConfigUtil.getMaxGroupMemberLimit()) {
+    if (totalMemberCount > Integer.parseInt(PropertiesCache.getConfigValue(JsonKey.MAX_GROUP_MEMBERS_LIMIT))) {
       logger.error("List of members exceeded the member size limit:{}", totalMemberCount);
       throw new BaseException(
           IResponseMessage.EXCEEDED_MAX_LIMIT,

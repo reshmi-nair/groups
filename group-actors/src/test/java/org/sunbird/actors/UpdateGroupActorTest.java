@@ -33,6 +33,7 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.util.JsonKey;
 import org.sunbird.util.SystemConfigUtil;
+import org.sunbird.util.helper.PropertiesCache;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -41,7 +42,8 @@ import org.sunbird.util.SystemConfigUtil;
   ServiceFactory.class,
   Localizer.class,
   Application.class,
-  SystemConfigUtil.class
+  SystemConfigUtil.class,
+  PropertiesCache.class
 })
 @PowerMockIgnore({"javax.management.*"})
 public class UpdateGroupActorTest extends BaseActorTest {
@@ -59,9 +61,11 @@ public class UpdateGroupActorTest extends BaseActorTest {
     cassandraOperation = mock(CassandraOperationImpl.class);
     when(ServiceFactory.getInstance()).thenReturn(cassandraOperation);
     mockCacheActor();
+
     PowerMockito.mockStatic(SystemConfigUtil.class);
-    when(SystemConfigUtil.getMaxGroupMemberLimit()).thenReturn(4);
-    when(SystemConfigUtil.getMaxActivityLimit()).thenReturn(4);
+    PowerMockito.mockStatic(PropertiesCache.class);
+    when(PropertiesCache.getConfigValue(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
+    when(PropertiesCache.getConfigValue(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
   }
 
   @Test

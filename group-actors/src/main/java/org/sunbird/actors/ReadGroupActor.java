@@ -14,6 +14,8 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.service.GroupService;
 import org.sunbird.service.GroupServiceImpl;
+import org.sunbird.service.MemberService;
+import org.sunbird.service.MemberServiceImpl;
 import org.sunbird.util.CacheUtil;
 import org.sunbird.util.JsonKey;
 import org.sunbird.util.JsonUtils;
@@ -44,6 +46,7 @@ public class ReadGroupActor extends BaseActor {
   private void readGroup(Request actorMessage) throws Exception {
     CacheUtil cacheUtil = new CacheUtil();
     GroupService groupService = new GroupServiceImpl();
+    MemberService memberService = new MemberServiceImpl();
     String groupId = (String) actorMessage.getRequest().get(JsonKey.GROUP_ID);
     List<String> requestFields = (List<String>) actorMessage.getRequest().get(JsonKey.FIELDS);
     logger.info("Reading group with groupId {} and required fields {}", groupId, requestFields);
@@ -62,7 +65,7 @@ public class ReadGroupActor extends BaseActor {
         memberResponses =
             JsonUtils.deserialize(groupMember, new TypeReference<List<MemberResponse>>() {});
       } else {
-        memberResponses = groupService.readGroupMembers(groupId);
+        memberResponses = memberService.readGroupMembers(groupId);
         cacheUtil.setCache(
             constructRedisIdentifier(groupId),
             JsonUtils.serialize(memberResponses),

@@ -22,11 +22,14 @@ public interface MemberService {
       List<Map<String, Object>> memberList, String groupId, String contextUserId)
       throws BaseException;
 
-  List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
+  List<MemberResponse> readGroupMembers(String groupId) throws BaseException;
+
+  List<MemberResponse> fetchMembersByGroupId(String groupId)
       throws BaseException;
+
+  List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
+          throws BaseException;
 
   Map<String, String> fetchGroupRoleByUser(List<String> groupIds, String userId)
       throws BaseException;
-
-  Integer fetchMemberSize(String groupId) throws BaseException;
 }

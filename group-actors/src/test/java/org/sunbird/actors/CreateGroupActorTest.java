@@ -7,7 +7,11 @@ import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
 import com.datastax.driver.core.ResultSet;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -28,6 +32,7 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.util.JsonKey;
 import org.sunbird.util.SystemConfigUtil;
+import org.sunbird.util.helper.PropertiesCache;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -35,7 +40,8 @@ import org.sunbird.util.SystemConfigUtil;
   CassandraOperationImpl.class,
   ServiceFactory.class,
   Localizer.class,
-  SystemConfigUtil.class
+  SystemConfigUtil.class,
+  PropertiesCache.class
 })
 @PowerMockIgnore({"javax.management.*"})
 public class CreateGroupActorTest extends BaseActorTest {
@@ -97,8 +103,10 @@ public class CreateGroupActorTest extends BaseActorTest {
         members.get(0).get(JsonKey.USER_ID), memberList.get(0).get(JsonKey.USER_ID));
 
     PowerMockito.mockStatic(SystemConfigUtil.class);
-    when(SystemConfigUtil.getMaxGroupMemberLimit()).thenReturn(4);
-    when(SystemConfigUtil.getMaxActivityLimit()).thenReturn(4);
+
+    PowerMockito.mockStatic(PropertiesCache.class);
+    when(PropertiesCache.getConfigValue(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
+    when(PropertiesCache.getConfigValue(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
   }
 
   @Test

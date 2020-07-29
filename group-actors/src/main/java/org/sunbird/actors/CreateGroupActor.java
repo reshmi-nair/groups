@@ -89,32 +89,37 @@ public class CreateGroupActor extends BaseActor {
     response.put(JsonKey.GROUP_ID, groupId);
     logger.info("group created successfully with groupId {}", groupId);
     sender().tell(response, self());
+
+    logTelemetry(actorMessage, groupId);
+  }
+
+  private void deleteUserCache(List<Map<String, Object>> memberList) {
+    CacheUtil cacheUtil = new CacheUtil();
+    logger.info("Delete user cache from redis");
+    memberList.forEach(member -> cacheUtil.delCache((String) (member.get(JsonKey.USER_ID))));
+  }
+
+  private void logTelemetry(Request actorMessage, String groupId) {
     String source =
-        actorMessage.getContext().get(JsonKey.REQUEST_SOURCE) != null
-            ? (String) actorMessage.getContext().get(JsonKey.REQUEST_SOURCE)
-            : "";
+            actorMessage.getContext().get(JsonKey.REQUEST_SOURCE) != null
+                    ? (String) actorMessage.getContext().get(JsonKey.REQUEST_SOURCE)
+                    : "";
 
     List<Map<String, Object>> correlatedObject = new ArrayList<>();
     if (StringUtils.isNotBlank(source)) {
       TelemetryUtil.generateCorrelatedObject(
-          source, StringUtils.capitalize(JsonKey.REQUEST_SOURCE), null, correlatedObject);
+              source, StringUtils.capitalize(JsonKey.REQUEST_SOURCE), null, correlatedObject);
     }
     Map<String, Object> targetObject = null;
     targetObject =
-        TelemetryUtil.generateTargetObject(groupId, TelemetryEnvKey.GROUP, JsonKey.CREATE, null);
+            TelemetryUtil.generateTargetObject(groupId, TelemetryEnvKey.GROUP, JsonKey.CREATE, null);
 
     TelemetryUtil.generateCorrelatedObject(
-        (String) actorMessage.getContext().get(JsonKey.USER_ID),
-        TelemetryEnvKey.USER,
-        null,
-        correlatedObject);
+            (String) actorMessage.getContext().get(JsonKey.USER_ID),
+            TelemetryEnvKey.USER,
+            null,
+            correlatedObject);
     TelemetryUtil.telemetryProcessingCall(
-        actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
-  }
-
-  public void deleteUserCache(List<Map<String, Object>> memberList) {
-    CacheUtil cacheUtil = new CacheUtil();
-    logger.info("Delete user cache from redis");
-    memberList.forEach(member -> cacheUtil.delCache((String) (member.get(JsonKey.USER_ID))));
+            actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
   }
 }
