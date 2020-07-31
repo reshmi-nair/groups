@@ -2,8 +2,11 @@ package org.sunbird.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -18,9 +21,12 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.models.Group;
 import org.sunbird.models.GroupResponse;
-import org.sunbird.models.MemberResponse;
 import org.sunbird.response.Response;
-import org.sunbird.util.*;
+import org.sunbird.util.ActivityConfigReader;
+import org.sunbird.util.GroupUtil;
+import org.sunbird.util.JsonKey;
+import org.sunbird.util.JsonUtils;
+import org.sunbird.util.SearchServiceUtil;
 
 public class GroupServiceImpl implements GroupService {
   private static Logger logger = LoggerFactory.getLogger(GroupServiceImpl.class);
@@ -73,14 +79,6 @@ public class GroupServiceImpl implements GroupService {
     if (dbResActivities != null && !dbResActivities.isEmpty()) {
       addActivityInfoDetails(dbResActivities);
     }
-  }
-
-  @Override
-  public List<MemberResponse> readGroupMembers(String groupId) throws Exception {
-
-    List<MemberResponse> members =
-        memberService.fetchMembersByGroupIds(Lists.newArrayList(groupId), null);
-    return members;
   }
 
   /**

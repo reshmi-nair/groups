@@ -33,6 +33,7 @@ import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.util.JsonKey;
 import org.sunbird.util.SystemConfigUtil;
+import org.sunbird.util.helper.PropertiesCache;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -41,7 +42,8 @@ import org.sunbird.util.SystemConfigUtil;
   ServiceFactory.class,
   Localizer.class,
   Application.class,
-  SystemConfigUtil.class
+  SystemConfigUtil.class,
+  PropertiesCache.class
 })
 @PowerMockIgnore({"javax.management.*"})
 public class UpdateGroupActorTest extends BaseActorTest {
@@ -49,7 +51,7 @@ public class UpdateGroupActorTest extends BaseActorTest {
   private final Props props = Props.create(UpdateGroupActor.class);
   private Logger logger = LoggerFactory.getLogger(UpdateGroupActorTest.class);
   public static CassandraOperation cassandraOperation;
-
+  public static PropertiesCache propertiesCache;
   @Before
   public void setUp() throws Exception {
     PowerMockito.mockStatic(Localizer.class);
@@ -59,9 +61,13 @@ public class UpdateGroupActorTest extends BaseActorTest {
     cassandraOperation = mock(CassandraOperationImpl.class);
     when(ServiceFactory.getInstance()).thenReturn(cassandraOperation);
     mockCacheActor();
+
     PowerMockito.mockStatic(SystemConfigUtil.class);
-    when(SystemConfigUtil.getMaxGroupMemberLimit()).thenReturn(4);
-    when(SystemConfigUtil.getMaxActivityLimit()).thenReturn(4);
+    PowerMockito.mockStatic(PropertiesCache.class);
+    propertiesCache = mock(PropertiesCache.class);
+    when(PropertiesCache.getInstance()).thenReturn(propertiesCache);
+    when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
+    when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
   }
 
   @Test
@@ -123,6 +129,9 @@ public class UpdateGroupActorTest extends BaseActorTest {
   private static Request updateGroupReq() {
     Request reqObj = new Request();
     reqObj.setHeaders(headerMap);
+    Map<String, Object> context = new HashMap<>();
+    context.put(JsonKey.USER_ID,"user1");
+    reqObj.setContext(context);
     reqObj.setOperation(ActorOperations.UPDATE_GROUP.getValue());
     reqObj.getRequest().put(JsonKey.GROUP_NAME, "TestGroup Name1");
     Map<String, List<Map<String, Object>>> memberOpearations = new HashMap<>();

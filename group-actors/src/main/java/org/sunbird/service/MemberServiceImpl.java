@@ -1,6 +1,7 @@
 package org.sunbird.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,10 +104,40 @@ public class MemberServiceImpl implements MemberService {
     return addMemberRes;
   }
 
-  // TODO: Fix me to get the Members Details with List<Member> includes name of the user
-
   /**
    * Fetch Member Details based on Group
+   *
+   * @param groupId
+   * @return
+   * @throws BaseException
+   */
+  @Override
+  public List<MemberResponse> readGroupMembers(String groupId) throws BaseException {
+
+    List<MemberResponse> members = fetchMembersByGroupIds(Lists.newArrayList(groupId), null);
+
+    if (!members.isEmpty()) {
+      fetchMemberDetails(members);
+    }
+    return members;
+  }
+
+  /**
+   * Fetch Members based on Group
+   *
+   * @param groupId
+   * @return
+   * @throws BaseException
+   */
+  @Override
+  public List<MemberResponse> fetchMembersByGroupId(String groupId)
+          throws BaseException {
+    List<MemberResponse> members = fetchMembersByGroupIds(Lists.newArrayList(groupId), null);
+    return members;
+  }
+
+  /**
+   * Fetch Members based on Group
    *
    * @param groupIds
    * @param fields
@@ -131,9 +162,6 @@ public class MemberServiceImpl implements MemberService {
               }
             });
       }
-    }
-    if (!members.isEmpty()) {
-      fetchMemberDetails(members);
     }
     return members;
   }
@@ -192,20 +220,6 @@ public class MemberServiceImpl implements MemberService {
       }
     }
     return groupRoleMap;
-  }
-
-  @Override
-  public Integer fetchMemberSize(String groupId) throws BaseException {
-
-    Response response = memberDao.fetchMemberSize(groupId);
-    if (null != response && null != response.getResult()) {
-      List<Map<String, Object>> dbResponse =
-          (List<Map<String, Object>>) response.getResult().get(JsonKey.RESPONSE);
-      if (null != dbResponse) {
-        return ((Long) dbResponse.get(0).get(JsonKey.COUNT)).intValue();
-      }
-    }
-    return 0;
   }
 
   private Member getMemberModelForAdd(

@@ -40,6 +40,10 @@ public class RequestMapper {
             mapper.readValue(httpReq.flash().get(JsonKey.CONTEXT), Map.class);
         request.setContext((Map<String, Object>) contextObject.get(JsonKey.CONTEXT));
       }
+
+      logger.info(JsonKey.USER_ID + " in RequestMapper.createSBRequest(): " + (String) httpReq.flash().get(JsonKey.USER_ID));
+      logger.info(JsonKey.MANAGED_FOR + " in RequestMapper.createSBRequest(): " + (String) httpReq.flash().get(JsonKey.MANAGED_FOR));
+
       request.getContext().put(JsonKey.USER_ID, httpReq.flash().get(JsonKey.USER_ID));
       request.getContext().put(JsonKey.MANAGED_FOR, httpReq.flash().get(JsonKey.MANAGED_FOR));
       request.setPath(httpReq.path());

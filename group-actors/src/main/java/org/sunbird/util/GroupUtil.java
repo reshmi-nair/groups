@@ -5,12 +5,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.models.GroupResponse;
+import org.sunbird.models.MemberResponse;
+import org.sunbird.util.helper.PropertiesCache;
 
 public class GroupUtil {
 
@@ -63,7 +66,8 @@ public class GroupUtil {
   }
 
   public static void checkMaxActivityLimit(Integer totalActivityCount) {
-    if (totalActivityCount > SystemConfigUtil.getMaxActivityLimit()) {
+    int activityLimit = Integer.parseInt(PropertiesCache.getInstance().getProperty(JsonKey.MAX_ACTIVITY_LIMIT));
+    if (totalActivityCount > activityLimit) {
       logger.error("List of activities exceeded the activity size limit:{}", totalActivityCount);
       throw new BaseException(
           IResponseMessage.EXCEEDED_MAX_LIMIT,
@@ -73,12 +77,28 @@ public class GroupUtil {
   }
 
   public static void checkMaxMemberLimit(int totalMemberCount) {
-    if (totalMemberCount > SystemConfigUtil.getMaxGroupMemberLimit()) {
+    int memberLimit = Integer.parseInt(PropertiesCache.getInstance().getProperty(JsonKey.MAX_GROUP_MEMBERS_LIMIT));
+    if (totalMemberCount > memberLimit) {
       logger.error("List of members exceeded the member size limit:{}", totalMemberCount);
       throw new BaseException(
           IResponseMessage.EXCEEDED_MAX_LIMIT,
           IResponseMessage.Message.EXCEEDED_MEMBER_MAX_LIMIT,
           ResponseCode.CLIENT_ERROR.getCode());
     }
+  }
+
+  public static int totalMemberCount(Map memberOperationMap, List<MemberResponse> membersInDB){
+    int totalMemberCount = (null != membersInDB ? membersInDB.size() : 0);
+
+    List<Map<String, Object>> memberAddList = (List<Map<String, Object>>) memberOperationMap.get(JsonKey.ADD);
+    if (CollectionUtils.isNotEmpty(memberAddList)) {
+      totalMemberCount += memberAddList.size();
+    }
+
+    List<Map<String, Object>> memberRemoveList = (List<Map<String, Object>>) memberOperationMap.get(JsonKey.REMOVE);
+    if (CollectionUtils.isNotEmpty(memberRemoveList)) {
+      totalMemberCount -= memberRemoveList.size();
+    }
+    return totalMemberCount;
   }
 }

@@ -5,7 +5,6 @@ import java.util.Map;
 import org.sunbird.exception.BaseException;
 import org.sunbird.models.Group;
 import org.sunbird.models.GroupResponse;
-import org.sunbird.models.MemberResponse;
 import org.sunbird.response.Response;
 
 public interface GroupService {
@@ -13,8 +12,6 @@ public interface GroupService {
   String createGroup(Group groupObj) throws BaseException;
 
   GroupResponse readGroup(String groupId) throws Exception;
-
-  List<MemberResponse> readGroupMembers(String groupId) throws Exception;
 
   void readGroupActivities(Map<String, Object> dbResGroup);
 
