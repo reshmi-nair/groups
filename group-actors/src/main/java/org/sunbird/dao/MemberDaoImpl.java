@@ -68,12 +68,9 @@ public class MemberDaoImpl implements MemberDao {
     return response;
   }
   public Response readGroupIdsByUserIds(List<String> memberList) throws BaseException {
-    Map<String, Object> members = new HashMap<>();
-    members.put(JsonKey.USER_ID, memberList);
-
     Response responseObj =
-            cassandraOperation.getRecordsByProperties(
-                    DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, members);
+            cassandraOperation.getRecordsByPrimaryKeys(
+                    DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, memberList,JsonKey.USER_ID);
     return responseObj;
   }
   private void addGroupInUserGroup(List<Map<String, Object>> memberList) throws BaseException {

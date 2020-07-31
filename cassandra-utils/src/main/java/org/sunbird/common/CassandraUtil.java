@@ -84,7 +84,7 @@ public final class CassandraUtil {
               .forEach(entry -> rowMap.put(entry.getKey(), row.getObject(entry.getValue())));
           responseList.add(rowMap);
         });
-    logger.info(responseList.toString());
+    //logger.info(responseList.toString());
     response.put(Constants.RESPONSE, responseList);
     return response;
   }
