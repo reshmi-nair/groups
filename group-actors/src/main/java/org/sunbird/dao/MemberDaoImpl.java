@@ -145,9 +145,10 @@ public class MemberDaoImpl implements MemberDao {
                               Set<String> groupIdsSet = (Set<String>) map.get(JsonKey.GROUP_ID);
                               groupIdsSet.remove(data.getGroupId());
                               if(groupIdsSet.size()==0){
-                                cassandraOperation.deleteRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE,data.getUserId());
+                                Map<String, String> compositeKeyMap = new HashMap<>();
+                                compositeKeyMap.put(JsonKey.USER_ID, data.getUserId());
+                                cassandraOperation.deleteRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE,compositeKeyMap);
                               }else{
-                                userGroupMap.put(JsonKey.USER_ID, data.getUserId());
                                 userGroupMap.put(JsonKey.GROUP_ID, groupIdsSet);
                               }
                             }
@@ -155,7 +156,9 @@ public class MemberDaoImpl implements MemberDao {
                 }
               }
               if(MapUtils.isNotEmpty(userGroupMap)){
-                cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, userGroupMap);
+                Map<String, Object> compositeKeyMap = new HashMap<>();
+                compositeKeyMap.put(JsonKey.USER_ID, data.getUserId());
+                cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, userGroupMap, compositeKeyMap);
               }
             });
   }
