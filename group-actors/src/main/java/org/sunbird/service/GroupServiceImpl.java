@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.dao.GroupDao;
 import org.sunbird.dao.GroupDaoImpl;
+import org.sunbird.dao.MemberDao;
+import org.sunbird.dao.MemberDaoImpl;
 import org.sunbird.exception.BaseException;
 import org.sunbird.exception.ValidationException;
 import org.sunbird.message.IResponseMessage;
@@ -34,6 +36,7 @@ public class GroupServiceImpl implements GroupService {
   private static GroupDao groupDao = GroupDaoImpl.getInstance();
   private static MemberService memberService = new MemberServiceImpl();
   private static ObjectMapper objectMapper = new ObjectMapper();
+  private static MemberDao memberDao = MemberDaoImpl.getInstance();
 
   @Override
   public String createGroup(Group groupObj) throws BaseException {
@@ -146,7 +149,7 @@ public class GroupServiceImpl implements GroupService {
    * @throws BaseException
    */
   private List<String> fetchAllGroupIdsByUserId(String userId) throws BaseException {
-    Response groupIdsResponse = groupDao.readGroupIdsByUserId(userId);
+    Response groupIdsResponse = memberDao.readGroupIdsByUserId(userId);
     if (null != groupIdsResponse && null != groupIdsResponse.getResult()) {
       List<Map<String, Object>> dbResGroupIds =
           (List<Map<String, Object>>) groupIdsResponse.getResult().get(JsonKey.RESPONSE);

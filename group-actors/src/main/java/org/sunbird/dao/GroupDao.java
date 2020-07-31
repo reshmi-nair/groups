@@ -27,15 +27,6 @@ public interface GroupDao {
   Response readGroup(String groupId) throws BaseException;
 
   /**
-   * This method will return group uuids based on userId and return response Object as success
-   * response or throw ProjectCommonException.
-   *
-   * @param userId
-   * @return responseObj with Group Details.
-   */
-  Response readGroupIdsByUserId(String userId) throws BaseException;
-
-  /**
    * This method will read group based on Id and return response Object as success response or throw
    * ProjectCommonException.
    *

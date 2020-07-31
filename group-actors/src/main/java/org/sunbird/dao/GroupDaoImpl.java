@@ -17,8 +17,6 @@ import org.sunbird.util.JsonKey;
 
 public class GroupDaoImpl implements GroupDao {
   private static final String GROUP_TABLE_NAME = "group";
-  private static final String USER_GROUP_TABLE_NAME = "user_group";
-  private static final String GROUP_MEMBER_TABLE_NAME = "group_member";
 
   private CassandraOperation cassandraOperation = ServiceFactory.getInstance();
   private ObjectMapper mapper = new ObjectMapper();
@@ -47,14 +45,6 @@ public class GroupDaoImpl implements GroupDao {
   public Response readGroup(String groupId) throws BaseException {
     Response responseObj =
         cassandraOperation.getRecordById(DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, groupId);
-    return responseObj;
-  }
-
-  @Override
-  public Response readGroupIdsByUserId(String userId) throws BaseException {
-    Response responseObj =
-        cassandraOperation.getRecordsByProperty(
-            DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE_NAME, JsonKey.USER_ID, userId);
     return responseObj;
   }
 

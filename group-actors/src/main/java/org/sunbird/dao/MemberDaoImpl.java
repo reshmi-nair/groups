@@ -49,30 +49,20 @@ public class MemberDaoImpl implements MemberDao {
     return response;
   }
 
-  private Response updateUserGroupTable(List<Map<String, Object>> memberList) throws BaseException {
-    logger.info(
-        "User Group table updation started for the group id {}",
-        memberList.get(0).get(JsonKey.GROUP_ID));
-    Response response = null;
-    for (Map<String, Object> member : memberList) {
-      Map<String, Object> primaryKey = new HashMap<>();
-      primaryKey.put(JsonKey.USER_ID, member.get(JsonKey.USER_ID));
-      response =
-          cassandraOperation.updateAddSetRecord(
-              DBUtil.KEY_SPACE_NAME,
-              USER_GROUP_TABLE,
-              primaryKey,
-              JsonKey.GROUP_ID,
-              member.get(JsonKey.GROUP_ID));
-    }
-    return response;
+  @Override
+  public Response readGroupIdsByUserId(String userId) throws BaseException {
+    List<String> userIds = new ArrayList<>();
+    userIds.add(userId);
+    return readGroupIdsByUserIds(userIds);
   }
+
   public Response readGroupIdsByUserIds(List<String> memberList) throws BaseException {
     Response responseObj =
             cassandraOperation.getRecordsByPrimaryKeys(
                     DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, memberList,JsonKey.USER_ID);
     return responseObj;
   }
+
   private void addGroupInUserGroup(List<Map<String, Object>> memberList) throws BaseException {
     logger.info(
             "User Group table update started for the group id {}",
@@ -178,32 +168,6 @@ public class MemberDaoImpl implements MemberDao {
     }
     Response response =
         cassandraOperation.batchUpdate(DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, list);
-    return response;
-  }
-
-  @Override
-  public Response removeMemberFromUserGroup(List<Member> members) throws BaseException {
-    List<Map<String, Object>> memberList =
-        mapper.convertValue(members, new TypeReference<List<Map<String, Object>>>() {});
-    logger.info(
-        "remove member from User group table started , no of members to be remove {}",
-        members.size());
-    Response response = new Response();
-    for (Map<String, Object> member : memberList) {
-      Map<String, Object> primaryKey = new HashMap<>();
-      primaryKey.put(JsonKey.USER_ID, member.get(JsonKey.USER_ID));
-      response =
-          cassandraOperation.updateRemoveSetRecord(
-              DBUtil.KEY_SPACE_NAME,
-              USER_GROUP_TABLE,
-              primaryKey,
-              JsonKey.GROUP_ID,
-              member.get(JsonKey.GROUP_ID));
-    }
-    logger.info(
-        "{} members removed successfully from the user group table : response {}",
-        memberList.size(),
-        response.getResult());
     return response;
   }
 
