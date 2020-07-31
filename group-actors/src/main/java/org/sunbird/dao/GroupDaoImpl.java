@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.sunbird.cassandra.CassandraOperation;
@@ -50,11 +49,9 @@ public class GroupDaoImpl implements GroupDao {
 
   @Override
   public Response readGroups(List<String> groupIds) throws BaseException {
-    Map<String, Object> properties = new HashMap<>();
-    properties.put(JsonKey.ID, groupIds);
     Response responseObj =
-        cassandraOperation.getRecordsByProperties(
-            DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, properties);
+        cassandraOperation.getRecordsByPrimaryKeys(
+            DBUtil.KEY_SPACE_NAME, GROUP_TABLE_NAME, groupIds, JsonKey.ID);
     return responseObj;
   }
 

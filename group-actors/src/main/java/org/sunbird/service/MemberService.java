@@ -27,7 +27,7 @@ public interface MemberService {
   List<MemberResponse> fetchMembersByGroupId(String groupId)
       throws BaseException;
 
-  List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
+  List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds)
           throws BaseException;
 
   Map<String, String> fetchGroupRoleByUser(List<String> groupIds, String userId)

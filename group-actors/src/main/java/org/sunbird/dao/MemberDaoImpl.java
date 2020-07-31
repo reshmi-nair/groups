@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -172,23 +173,23 @@ public class MemberDaoImpl implements MemberDao {
   }
 
   @Override
-  public Response fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
+  public Response fetchMembersByGroupIds(List<String> groupIds)
       throws BaseException {
     Map<String, Object> properties = new HashMap<>();
     properties.put(JsonKey.GROUP_ID, groupIds);
     Response responseObj =
-        cassandraOperation.getRecordsByProperties(
-            DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties, fields);
+        cassandraOperation.getRecordsByPrimaryKeys(
+            DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, groupIds, JsonKey.GROUP_ID);
     return responseObj;
   }
 
   @Override
   public Response fetchGroupRoleByUser(List<String> groupIds, String userId) throws BaseException {
-    Map<String, Object> properties = new HashMap<>();
+    Map<String, Object> properties = new LinkedHashMap<>();
     properties.put(JsonKey.GROUP_ID, groupIds);
     properties.put(JsonKey.USER_ID, userId);
     Response responseObj =
-        cassandraOperation.getRecordsByProperties(
+        cassandraOperation.getRecordsByCompositeKey(
             DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties);
     return responseObj;
   }
