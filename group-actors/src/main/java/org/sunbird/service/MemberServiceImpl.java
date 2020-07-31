@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
   public Response removeMembers(List<Member> member) throws BaseException {
     Response response = memberDao.editMembers(member);
     if (response != null && response.getResult().get(JsonKey.RESPONSE) != null) {
-      memberDao.removeMemberFromUserGroup(member);
+      memberDao.removeGroupInUserGroup(member);
     }
     return response;
   }
