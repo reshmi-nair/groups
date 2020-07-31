@@ -66,17 +66,28 @@ public class UpdateGroupActor extends BaseActor {
     }
 
     Map responseMap = null;
+    // member validation and updates to group
     if (MapUtils.isNotEmpty((Map) actorMessage.getRequest().get(JsonKey.MEMBERS))) {
-      // member updates to group
-      responseMap = handleMemberOperation(
+      responseMap = validateMembersAndSave(
               group.getId(),
               (Map) actorMessage.getRequest().get(JsonKey.MEMBERS),
-              requestHandler.getRequestedBy(actorMessage));
+              userId);
+    }
+    // Activity validation
+    if (MapUtils.isNotEmpty((Map<String, Object>) actorMessage.getRequest().get(JsonKey.ACTIVITIES))) {
+      validateActivityList(group, (Map<String, Object>) actorMessage.getRequest().get(JsonKey.ACTIVITIES));
     }
 
     // Group and activity updates
-    handleGroupActivityOperation(
-        group, (Map<String, Object>) actorMessage.getRequest().get(JsonKey.ACTIVITIES));
+    if( group!=null && (StringUtils.isNotEmpty(group.getDescription())
+            || StringUtils.isNotEmpty(group.getName())
+            || StringUtils.isNotEmpty(group.getMembershipType())
+            || StringUtils.isNotEmpty(group.getStatus())
+            || CollectionUtils.isNotEmpty(group.getActivities()))) {
+      cacheUtil.delCache(group.getId());
+      GroupService groupService = new GroupServiceImpl();
+      Response response = groupService.updateGroup(group);
+    }
 
     Response response = new Response(ResponseCode.OK.getCode());
     response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
@@ -88,22 +99,14 @@ public class UpdateGroupActor extends BaseActor {
     logTelemetry(actorMessage, group);
   }
 
-  private void handleGroupActivityOperation(Group group, Map<String, Object> activityOperationMap) {
-    GroupService groupService = new GroupServiceImpl();
-    Integer totalActivityCount = 0;
-    if (MapUtils.isNotEmpty(activityOperationMap)) {
+  private void validateActivityList(Group group, Map<String, Object> activityOperationMap) {
       List<Map<String, Object>> updateActivityList =
-            groupService.handleActivityOperations(group.getId(), activityOperationMap);
-        totalActivityCount = updateActivityList.size();
-
-      GroupUtil.checkMaxActivityLimit(totalActivityCount);
-      cacheUtil.delCache(group.getId());
+              new GroupServiceImpl().handleActivityOperations(group.getId(), activityOperationMap);
+      GroupUtil.checkMaxActivityLimit(updateActivityList.size());
       group.setActivities(updateActivityList);
-    }
-    Response response = groupService.updateGroup(group);
   }
 
-  private Map handleMemberOperation(String groupId, Map memberOperationMap, String requestedBy) {
+  private Map validateMembersAndSave(String groupId, Map memberOperationMap, String requestedBy) {
     Map validationErrors = new HashMap<>();
     List errorList = new ArrayList();
     validationErrors.put("members",errorList);
