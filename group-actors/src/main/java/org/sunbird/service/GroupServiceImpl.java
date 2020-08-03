@@ -52,6 +52,7 @@ public class GroupServiceImpl implements GroupService {
           (List<Map<String, Object>>) responseObj.getResult().get(JsonKey.RESPONSE);
       if (CollectionUtils.isNotEmpty(dbGroupDetails)
           && JsonKey.ACTIVE.equals(dbGroupDetails.get(0).get(JsonKey.STATUS))) {
+        logger.info("Group details fetched for groupId :{}",groupId);
         dbResGroup = dbGroupDetails.get(0);
         // update createdOn, updatedOn format to utc "yyyy-MM-dd HH:mm:ss:SSSZ
         dbResGroup.put(
@@ -66,6 +67,7 @@ public class GroupServiceImpl implements GroupService {
                 ? GroupUtil.convertDateToUTC((Date) dbResGroup.get(JsonKey.UPDATED_ON))
                 : dbResGroup.get(JsonKey.UPDATED_ON));
         readGroupActivities(dbResGroup);
+        logger.info("readGroupActivities ended");
         return JsonUtils.convert(dbResGroup, GroupResponse.class);
       } else {
         throw new ValidationException.GroupNotFound(groupId);
@@ -90,7 +92,7 @@ public class GroupServiceImpl implements GroupService {
    * @param dbResActivities
    */
   private void addActivityInfoDetails(List<Map<String, Object>> dbResActivities) {
-
+    logger.info("Fetching activityInfo for activity count: {}",dbResActivities.size());
     Map<SearchServiceUtil, Map<String, String>> idClassTypeMap =
         GroupUtil.groupActivityIdsBySearchUtilClass(dbResActivities);
 
@@ -154,9 +156,8 @@ public class GroupServiceImpl implements GroupService {
       List<Map<String, Object>> dbResGroupIds =
           (List<Map<String, Object>>) groupIdsResponse.getResult().get(JsonKey.RESPONSE);
       if (null != dbResGroupIds && !dbResGroupIds.isEmpty()) {
-        // remove groups where user is inactive
-        filterOutInActiveGroups(dbResGroupIds);
         Set<String> groupIdsSet = (Set<String>) dbResGroupIds.get(0).get(JsonKey.GROUP_ID);
+        logger.info("UserId {} has groupIds {}", userId, groupIdsSet.size());
         return new ArrayList<>(groupIdsSet);
       }
     }
@@ -196,6 +197,7 @@ public class GroupServiceImpl implements GroupService {
       List<Map<String, Object>> dbGroupDetails =
           (List<Map<String, Object>>) response.getResult().get(JsonKey.RESPONSE);
       if (null != dbGroupDetails) {
+        logger.info("Group details fetched - count : {} ", dbGroupDetails.size());
         dbGroupDetails.forEach(
             map -> {
               Group group = objectMapper.convertValue(map, Group.class);

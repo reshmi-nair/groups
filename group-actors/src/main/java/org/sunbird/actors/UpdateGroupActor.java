@@ -62,7 +62,7 @@ public class UpdateGroupActor extends BaseActor {
       throw new BaseException(
               IResponseMessage.Key.UNAUTHORIZED_USER,
               IResponseMessage.Message.UNAUTHORIZED_USER,
-              ResponseCode.CLIENT_ERROR.getCode());
+              ResponseCode.UNAUTHORIZED.getCode());
     }
 
     Map responseMap = null;
@@ -91,7 +91,7 @@ public class UpdateGroupActor extends BaseActor {
 
     Response response = new Response(ResponseCode.OK.getCode());
     response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
-    if(MapUtils.isNotEmpty(responseMap)){
+    if(MapUtils.isNotEmpty(responseMap) && ((List)responseMap.get(JsonKey.MEMBERS)).size()>0){
       response.put(JsonKey.ERROR, responseMap);
     }
     sender().tell(response, self());
@@ -109,7 +109,7 @@ public class UpdateGroupActor extends BaseActor {
   private Map validateMembersAndSave(String groupId, Map memberOperationMap, String requestedBy) {
     Map validationErrors = new HashMap<>();
     List errorList = new ArrayList();
-    validationErrors.put("members",errorList);
+    validationErrors.put(JsonKey.MEMBERS,errorList);
 
     MemberService memberService = new MemberServiceImpl();
     List<MemberResponse> membersInDB = memberService.fetchMembersByGroupId(groupId);

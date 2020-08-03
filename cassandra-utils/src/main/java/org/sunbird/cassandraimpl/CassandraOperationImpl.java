@@ -275,8 +275,9 @@ public abstract class CassandraOperationImpl implements CassandraOperation {
           }
         }
       }
+      //TODO : selectQuery.allowFiltering() is removed for now. Need to add a separate method for it
       ResultSet results =
-          connectionManager.getSession(keyspaceName).execute(selectQuery.allowFiltering());
+          connectionManager.getSession(keyspaceName).execute(selectQuery);
       response = CassandraUtil.createResponse(results);
     } catch (Exception e) {
       logger.error(Constants.EXCEPTION_MSG_FETCH + tableName + " : " + e.getMessage(), e);

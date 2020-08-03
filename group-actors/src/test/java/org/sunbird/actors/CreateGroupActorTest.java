@@ -74,12 +74,10 @@ public class CreateGroupActorTest extends BaseActorTest {
     List<Map<String, Object>> members =
         (List<Map<String, Object>>) reqObj.getRequest().get(JsonKey.MEMBERS);
 
-    when(cassandraOperation.updateAddSetRecord(
+    when(cassandraOperation.upsertRecord(
             Mockito.anyString(),
             Mockito.anyString(),
-            Mockito.anyMap(),
-            Mockito.anyString(),
-            Mockito.anyObject()))
+            Mockito.anyMap()))
         .thenReturn(
             CassandraMocker.updateUserGroup(members, (String) reqObj.getRequest().get(JsonKey.ID)));
 
@@ -110,6 +108,7 @@ public class CreateGroupActorTest extends BaseActorTest {
     when(PropertiesCache.getInstance()).thenReturn(propertiesCache);
     when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_GROUP_MEMBERS_LIMIT)).thenReturn("4");
     when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_ACTIVITY_LIMIT)).thenReturn("4");
+    when(PropertiesCache.getInstance().getProperty(JsonKey.MAX_GROUP_LIMIT)).thenReturn("4");
   }
 
   @Test

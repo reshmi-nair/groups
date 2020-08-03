@@ -37,5 +37,6 @@ public interface IResponseMessage {
     String UNABLE_TO_COMMUNICATE_WITH_ACTOR = "Unable to communicate with actor.";
     String EXCEEDED_MEMBER_MAX_LIMIT = "Exceeded the member max size limit";
     String EXCEEDED_ACTIVITY_MAX_LIMIT = "Exceeded the activity max size limit";
+    String EXCEEDED_GROUP_MAX_LIMIT = "Exceeded the group max size limit";
   }
 }
