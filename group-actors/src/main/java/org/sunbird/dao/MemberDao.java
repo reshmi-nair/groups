@@ -11,11 +11,19 @@ public interface MemberDao {
 
   Response editMembers(List<Member> member) throws BaseException;
 
-  Response fetchMembersByGroupIds(List<String> groupIds, List<String> fields) throws BaseException;
+  Response fetchMembersByGroupIds(List<String> groupIds) throws BaseException;
 
   Response fetchGroupRoleByUser(List<String> groupIds, String userId) throws BaseException;
 
-  Response removeMemberFromUserGroup(List<Member> member) throws BaseException;
+  void removeGroupInUserGroup(List<Member> member) throws BaseException;
 
-  Response fetchMemberSize(String groupId) throws BaseException;
+  /**
+   * This method will return group uuids based on userId and return response Object as success
+   * response or throw ProjectCommonException.
+   *
+   * @param userId
+   * @return responseObj with Group Details.
+   */
+  Response readGroupIdsByUserId(String userId) throws BaseException;
+
 }

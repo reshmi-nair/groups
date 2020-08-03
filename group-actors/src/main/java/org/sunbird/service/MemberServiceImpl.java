@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
   public Response removeMembers(List<Member> member) throws BaseException {
     Response response = memberDao.editMembers(member);
     if (response != null && response.getResult().get(JsonKey.RESPONSE) != null) {
-      memberDao.removeMemberFromUserGroup(member);
+      memberDao.removeGroupInUserGroup(member);
     }
     return response;
   }
@@ -114,7 +114,7 @@ public class MemberServiceImpl implements MemberService {
   @Override
   public List<MemberResponse> readGroupMembers(String groupId) throws BaseException {
 
-    List<MemberResponse> members = fetchMembersByGroupIds(Lists.newArrayList(groupId), null);
+    List<MemberResponse> members = fetchMembersByGroupIds(Lists.newArrayList(groupId));
 
     if (!members.isEmpty()) {
       fetchMemberDetails(members);
@@ -132,7 +132,7 @@ public class MemberServiceImpl implements MemberService {
   @Override
   public List<MemberResponse> fetchMembersByGroupId(String groupId)
           throws BaseException {
-    List<MemberResponse> members = fetchMembersByGroupIds(Lists.newArrayList(groupId), null);
+    List<MemberResponse> members = fetchMembersByGroupIds(Lists.newArrayList(groupId));
     return members;
   }
 
@@ -140,14 +140,13 @@ public class MemberServiceImpl implements MemberService {
    * Fetch Members based on Group
    *
    * @param groupIds
-   * @param fields
    * @return
    * @throws BaseException
    */
   @Override
-  public List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds, List<String> fields)
+  public List<MemberResponse> fetchMembersByGroupIds(List<String> groupIds)
       throws BaseException {
-    Response response = memberDao.fetchMembersByGroupIds(groupIds, fields);
+    Response response = memberDao.fetchMembersByGroupIds(groupIds);
     List<MemberResponse> members = new ArrayList<>();
     if (null != response && null != response.getResult()) {
       List<Map<String, Object>> dbResMembers =
