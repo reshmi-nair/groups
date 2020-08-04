@@ -36,9 +36,9 @@ public class MemberServiceImpl implements MemberService {
     Response response = memberDao.addMembers(member);
     if (response != null && response.getResult().get(JsonKey.RESPONSE) != null && dbResGroupIds == null) {
       dbResGroupIds = getGroupIdsforUserIds(GroupUtil.getMemberIdList(member));
-      //Update if userId is already in DB, otherwise insert
-      addGroupInUserGroup(member, dbResGroupIds);
     }
+    //Update if userId is already in DB, otherwise insert
+    addGroupInUserGroup(member, dbResGroupIds);
     return response;
   }
 
