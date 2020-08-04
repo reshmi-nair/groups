@@ -74,7 +74,6 @@ public interface JsonKey {
   String MESSAGE_ID = "X-msgId";
   String ANONYMOUS = "Anonymous";
   List<String> USER_UNAUTH_STATES = Arrays.asList(JsonKey.UNAUTHORIZED, JsonKey.ANONYMOUS);
-  String IS_AUTH_REQ = "isAuthReq";
   String REQUEST = "request";
   String IS_SSO_ENABLED = "sso.enabled";
   String PARENT_ID = "parentId";
@@ -151,4 +150,5 @@ public interface JsonKey {
   String ERROR_MESSAGE = "errorMessage";
   String MEMBER_EXISTS = "MEMBER_EXISTS";
   String MEMBER_NOT_FOUND = "MEMBER_NOT_FOUND";
+  String MAX_GROUP_LIMIT = "max_group_limit";
 }

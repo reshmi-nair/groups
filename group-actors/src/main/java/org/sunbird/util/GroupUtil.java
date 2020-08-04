@@ -5,13 +5,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.exception.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.models.GroupResponse;
+import org.sunbird.models.Member;
 import org.sunbird.models.MemberResponse;
 import org.sunbird.util.helper.PropertiesCache;
 
@@ -47,6 +51,7 @@ public class GroupUtil {
 
   public static Map<SearchServiceUtil, Map<String, String>> groupActivityIdsBySearchUtilClass(
       List<Map<String, Object>> activities) {
+    logger.info("groupActivityIdsBySearchUtilClass");
     Map<SearchServiceUtil, Map<String, String>> idClassTypeMap = new HashMap<>();
     for (Map<String, Object> activity : activities) {
       SearchServiceUtil searchUtil =
@@ -63,6 +68,28 @@ public class GroupUtil {
       }
     }
     return idClassTypeMap;
+  }
+
+  public static void checkMaxGroupLimit(List<Map<String, Object>> userGroupsList, String userId) {
+    int groupCount = 0;
+    if(CollectionUtils.isNotEmpty(userGroupsList)) {
+      Map<String, Object> userInfo = userGroupsList
+              .stream()
+              .filter(userMap -> userId.equals((String) userMap.get(JsonKey.USER_ID)))
+              .findFirst()
+              .orElse(null);
+      if (MapUtils.isNotEmpty(userInfo)) {
+        groupCount = ((Set<String>) userInfo.get(JsonKey.GROUP_ID)).size();
+      }
+    }
+    int maxGroupLimit = Integer.parseInt(PropertiesCache.getInstance().getProperty(JsonKey.MAX_GROUP_LIMIT));
+    if (groupCount > maxGroupLimit) {
+      logger.error("List of groups exceeded the max limit:{}", groupCount);
+      throw new BaseException(
+              IResponseMessage.EXCEEDED_MAX_LIMIT,
+              IResponseMessage.Message.EXCEEDED_GROUP_MAX_LIMIT,
+              ResponseCode.CLIENT_ERROR.getCode());
+    }
   }
 
   public static void checkMaxActivityLimit(Integer totalActivityCount) {
@@ -100,5 +127,23 @@ public class GroupUtil {
       totalMemberCount -= memberRemoveList.size();
     }
     return totalMemberCount;
+  }
+
+  public static List<String> getMemberIdList(List<Member> member){
+    List<String> members =
+            member
+                    .stream()
+                    .map(data -> data.getUserId())
+                    .collect(Collectors.toList());
+    return members;
+  }
+
+  public static List<String> getMemberIdListFromMap( List<Map<String, Object>> member){
+    List<String> members =
+            member
+                    .stream()
+                    .map(data -> (String) data.get(JsonKey.USER_ID))
+                    .collect(Collectors.toList());
+    return members;
   }
 }

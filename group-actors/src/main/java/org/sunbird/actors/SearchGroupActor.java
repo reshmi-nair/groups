@@ -73,6 +73,7 @@ public class SearchGroupActor extends BaseActor {
         }
       }
       if (getFromDB || CollectionUtils.isEmpty(groupDetails)) {
+        logger.info("/group/list cache is empty. Fetching details from DB");
         groupDetails = groupService.searchGroup(filterMap);
         if (isUseridRedisEnabled) {
           try {

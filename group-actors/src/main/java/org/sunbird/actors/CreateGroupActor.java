@@ -51,6 +51,7 @@ public class CreateGroupActor extends BaseActor {
   private void createGroup(Request actorMessage) throws BaseException {
     logger.info("In createGroup() actor");
     GroupService groupService = new GroupServiceImpl();
+    MemberService memberService = new MemberServiceImpl();
 
     GroupRequestHandler requestHandler = new GroupRequestHandler();
     Group group = requestHandler.handleCreateGroupRequest(actorMessage);
@@ -60,8 +61,9 @@ public class CreateGroupActor extends BaseActor {
       throw new BaseException(
               IResponseMessage.Key.UNAUTHORIZED_USER,
               IResponseMessage.Message.UNAUTHORIZED_USER,
-              ResponseCode.CLIENT_ERROR.getCode());
+              ResponseCode.UNAUTHORIZED.getCode());
     }
+
     // add creator of group to memberList as admin
     List<Map<String, Object>> memberList = new ArrayList<>();
     Map<String, Object> createdUser = new HashMap<>();
@@ -76,6 +78,9 @@ public class CreateGroupActor extends BaseActor {
       memberList.addAll(reqMemberList);
     }
 
+    logger.info("Fetching groups from user-group for userId {}", userId);
+    List<Map<String, Object>> userGroupsList = memberService.getGroupIdsforUserIds(GroupUtil.getMemberIdListFromMap(memberList));
+    GroupUtil.checkMaxGroupLimit(userGroupsList, userId);
     GroupUtil.checkMaxMemberLimit(memberList.size());
     GroupUtil.checkMaxActivityLimit(group.getActivities().size());
     String groupId = groupService.createGroup(group);
@@ -88,10 +93,9 @@ public class CreateGroupActor extends BaseActor {
       if (isUseridRedisEnabled) {
         deleteUserCache(memberList);
       }
-      MemberService memberService = new MemberServiceImpl();
       Response addMembersRes =
           memberService.handleMemberAddition(
-              memberList, groupId, requestHandler.getRequestedBy(actorMessage));
+              memberList, groupId, userId, userGroupsList);
       logger.info(
           "Adding members to the group : {} ended , response {}",
           groupId,

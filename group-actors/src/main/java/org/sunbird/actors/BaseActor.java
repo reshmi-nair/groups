@@ -63,11 +63,10 @@ public abstract class BaseActor extends UntypedAbstractActor {
    */
   protected void onReceiveException(String callerName, Exception exception) throws Exception {
     logger.error(
-        "Exception in message processing for: "
-            + callerName
-            + " :: message: "
-            + exception.getMessage(),
-        exception);
+            "Exception in message processing for: {} :: message: {} {}"
+            , callerName
+            , exception.getMessage(),
+            exception);
     sender().tell(exception, self());
   }
 

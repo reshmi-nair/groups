@@ -4,14 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sunbird.cassandra.CassandraOperation;
@@ -46,7 +42,6 @@ public class MemberDaoImpl implements MemberDao {
         mapper.convertValue(member, new TypeReference<List<Map<String, Object>>>() {});
     Response response =
         cassandraOperation.batchInsert(DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, memberList);
-    addGroupInUserGroup(memberList);
     return response;
   }
 
@@ -64,91 +59,25 @@ public class MemberDaoImpl implements MemberDao {
     return responseObj;
   }
 
-  private void addGroupInUserGroup(List<Map<String, Object>> memberList) throws BaseException {
-    logger.info(
-            "User Group table update started for the group id {}",
-            memberList.get(0).get(JsonKey.GROUP_ID));
-
-    List<String> members =
-            memberList
-                    .stream()
-                    .map(data -> (String) data.get(JsonKey.USER_ID))
-                    .collect(Collectors.toList());
-
-    Response userGroupResponseObj = readGroupIdsByUserIds(members);
-    memberList
-            .stream()
-            .forEach(data -> {
-              Map<String, Object> userGroupMap = new HashMap<>();
-              if (null != userGroupResponseObj && null != userGroupResponseObj.getResult()) {
-                List<Map<String, Object>> dbResGroupIds = (List<Map<String, Object>>) userGroupResponseObj.getResult().get(JsonKey.RESPONSE);
-                if (CollectionUtils.isNotEmpty(dbResGroupIds)) {
-                  Map<String, Object> userMap =dbResGroupIds
-                      .stream()
-                           .filter(dbMap -> ((String) data.get(JsonKey.USER_ID)).equals((String)dbMap.get(JsonKey.USER_ID)))
-                           .findFirst().orElse(null);
-                  if(MapUtils.isEmpty(userMap)){
-                    createUserGroupRecord(new HashSet<>(), data, userGroupMap);
-                  }else {
-                    createUserGroupRecord((Set<String>) userMap.get(JsonKey.GROUP_ID), data, userGroupMap);
-                  }
-                }else {
-                  createUserGroupRecord(new HashSet<>(), data, userGroupMap);
-                }
-              }
-              if(MapUtils.isNotEmpty(userGroupMap)) {
-                cassandraOperation.upsertRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, userGroupMap);
-              }
-  });
+  public Response upsertGroupInUserGroup(Map<String, Object> userGroupMap) throws BaseException {
+    Response responseObj =
+            cassandraOperation.upsertRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, userGroupMap);
+    return responseObj;
   }
 
-  private void createUserGroupRecord(Set<String> groupSet, Map<String, Object> data, Map<String, Object> userGroupMap) {
-    groupSet.add((String) data.get(JsonKey.GROUP_ID));
-    userGroupMap.put(JsonKey.USER_ID, (String) data.get(JsonKey.USER_ID));
-    userGroupMap.put(JsonKey.GROUP_ID, groupSet);
+  public Response updateGroupInUserGroup(Map<String, Object> userGroupMap) throws BaseException {
+    Map<String, Object> compositeKeyMap = new HashMap<>();
+    compositeKeyMap.put(JsonKey.USER_ID, (String)userGroupMap.get(JsonKey.USER_ID));
+
+    Response responseObj =
+            cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, userGroupMap, compositeKeyMap);
+    return responseObj;
   }
 
-  public void removeGroupInUserGroup(List<Member> memberList) throws BaseException {
-    logger.info(
-            "User Group table update started for the group id {}",
-            memberList.get(0).getGroupId());
-    List<String> members =
-            memberList
-                    .stream()
-                    .map(data -> (String) data.getUserId())
-                    .collect(Collectors.toList());
-
-    Response userGroupResponseObj = readGroupIdsByUserIds(members);
-    memberList
-            .stream()
-            .forEach(data -> {
-              Map<String, Object> userGroupMap = new HashMap<>();
-              if (null != userGroupResponseObj && null != userGroupResponseObj.getResult()) {
-                List<Map<String, Object>> dbResGroupIds = (List<Map<String, Object>>) userGroupResponseObj.getResult().get(JsonKey.RESPONSE);
-                if (CollectionUtils.isNotEmpty(dbResGroupIds)) {
-                  dbResGroupIds
-                          .stream()
-                          .forEach(map -> {
-                            if(((String) data.getUserId()).equals((String)map.get(JsonKey.USER_ID))){
-                              Set<String> groupIdsSet = (Set<String>) map.get(JsonKey.GROUP_ID);
-                              groupIdsSet.remove(data.getGroupId());
-                              if(groupIdsSet.size()==0){
-                                Map<String, String> compositeKeyMap = new HashMap<>();
-                                compositeKeyMap.put(JsonKey.USER_ID, data.getUserId());
-                                cassandraOperation.deleteRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE,compositeKeyMap);
-                              }else{
-                                userGroupMap.put(JsonKey.GROUP_ID, groupIdsSet);
-                              }
-                            }
-                          });
-                }
-              }
-              if(MapUtils.isNotEmpty(userGroupMap)){
-                Map<String, Object> compositeKeyMap = new HashMap<>();
-                compositeKeyMap.put(JsonKey.USER_ID, data.getUserId());
-                cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, userGroupMap, compositeKeyMap);
-              }
-            });
+  public void deleteFromUserGroup(String userId) throws BaseException {
+    Map<String, String> compositeKeyMap = new HashMap<>();
+    compositeKeyMap.put(JsonKey.USER_ID, userId);
+    cassandraOperation.deleteRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE,compositeKeyMap);
   }
 
   @Override
@@ -189,7 +118,7 @@ public class MemberDaoImpl implements MemberDao {
     properties.put(JsonKey.GROUP_ID, groupIds);
     properties.put(JsonKey.USER_ID, userId);
     Response responseObj =
-        cassandraOperation.getRecordsByCompositeKey(
+        cassandraOperation.getRecordsByProperties(
             DBUtil.KEY_SPACE_NAME, GROUP_MEMBER_TABLE, properties);
     return responseObj;
   }

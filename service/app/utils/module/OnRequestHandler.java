@@ -50,23 +50,17 @@ public class OnRequestHandler implements ActionCreator {
         CompletionStage<Result> result = checkForServiceHealth(request);
         if (result != null) return result;
 
-        //Clearing all info set in flash()
-        request.flash().put(JsonKey.USER_ID, null);
-        request.flash().put(JsonKey.MANAGED_FOR, null);
-        request.flash().put(JsonKey.IS_AUTH_REQ, null);
-        request.flash().put(JsonKey.CONTEXT, null);
-
         String message = RequestInterceptor.verifyRequestData(request);
         initializeContext(request, message);
         if (!JsonKey.USER_UNAUTH_STATES.contains(message)) {
           request.flash().put(JsonKey.USER_ID, message);
-          request.flash().put(JsonKey.IS_AUTH_REQ, "false");
           result = delegate.call(request);
         } else if (JsonKey.UNAUTHORIZED.equals(message)) {
           result = onDataValidationError(request, message);
         } else {
           result = delegate.call(request);
         }
+
         return result.thenApply(res -> res.withHeader("Access-Control-Allow-Origin", "*"));
       }
     };
