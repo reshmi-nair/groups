@@ -66,7 +66,7 @@ public class MemberServiceImpl implements MemberService {
                         .filter(dbMap -> (data.getUserId()).equals((String)dbMap.get(JsonKey.USER_ID)))
                         .findFirst().orElse(null);
                 if(MapUtils.isNotEmpty(userDbMap)){
-                  createUserGroupRecord((Set<String>) userDbMap.get(JsonKey.GROUP_ID), data);
+                  userGroupMap = createUserGroupRecord((Set<String>) userDbMap.get(JsonKey.GROUP_ID), data);
                 }
               }
               if(MapUtils.isNotEmpty(userGroupMap)) {
