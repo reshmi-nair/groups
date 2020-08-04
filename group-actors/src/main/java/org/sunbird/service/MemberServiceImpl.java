@@ -124,8 +124,8 @@ public class MemberServiceImpl implements MemberService {
                           }
                         });
               }
-              if(MapUtils.isNotEmpty(userGroupMap)){
-                memberDao.updateGroupInUserGroup(userGroupMap);
+              if(MapUtils.isNotEmpty(userGroupMap) && userGroupMap.size()>0){
+                memberDao.updateGroupInUserGroup(userGroupMap,data.getUserId());
               }
             });
   }
