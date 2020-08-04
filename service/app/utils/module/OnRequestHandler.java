@@ -61,8 +61,6 @@ public class OnRequestHandler implements ActionCreator {
           result = delegate.call(request);
         }
 
-        //Clearing userid set in flash()
-        request.flash().put(JsonKey.USER_ID, null);
         return result.thenApply(res -> res.withHeader("Access-Control-Allow-Origin", "*"));
       }
     };
