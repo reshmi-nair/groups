@@ -40,11 +40,14 @@ public class RequestMapper {
             mapper.readValue(httpReq.flash().get(JsonKey.CONTEXT), Map.class);
         request.setContext((Map<String, Object>) contextObject.get(JsonKey.CONTEXT));
       }
+      String userId = null;
+      if(httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.USERID)){
+        userId = (String)httpReq.attrs().get(Attrs.USERID);
+      }
+      logger.info(JsonKey.USER_ID + " in RequestMapper.createSBRequest(): " + userId);
+      request.getContext().put(JsonKey.USER_ID, userId);
 
-      logger.info(JsonKey.USER_ID + " in RequestMapper.createSBRequest(): " + (String) httpReq.flash().get(JsonKey.USER_ID));
       logger.info(JsonKey.MANAGED_FOR + " in RequestMapper.createSBRequest(): " + (String) httpReq.flash().get(JsonKey.MANAGED_FOR));
-
-      request.getContext().put(JsonKey.USER_ID, httpReq.flash().get(JsonKey.USER_ID));
       request.getContext().put(JsonKey.MANAGED_FOR, httpReq.flash().get(JsonKey.MANAGED_FOR));
       request.setPath(httpReq.path());
 

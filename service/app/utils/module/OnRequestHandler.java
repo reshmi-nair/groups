@@ -53,7 +53,7 @@ public class OnRequestHandler implements ActionCreator {
         String message = RequestInterceptor.verifyRequestData(request);
         initializeContext(request, message);
         if (!JsonKey.USER_UNAUTH_STATES.contains(message)) {
-          request.flash().put(JsonKey.USER_ID, message);
+          request= request.addAttr(Attrs.USERID, message);
           result = delegate.call(request);
         } else if (JsonKey.UNAUTHORIZED.equals(message)) {
           result = onDataValidationError(request, message);
