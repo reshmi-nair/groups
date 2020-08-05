@@ -65,9 +65,9 @@ public class MemberDaoImpl implements MemberDao {
     return responseObj;
   }
 
-  public Response updateGroupInUserGroup(Map<String, Object> userGroupMap) throws BaseException {
+  public Response updateGroupInUserGroup(Map<String, Object> userGroupMap, String userId) throws BaseException {
     Map<String, Object> compositeKeyMap = new HashMap<>();
-    compositeKeyMap.put(JsonKey.USER_ID, (String)userGroupMap.get(JsonKey.USER_ID));
+    compositeKeyMap.put(JsonKey.USER_ID, userId);
 
     Response responseObj =
             cassandraOperation.updateRecord(DBUtil.KEY_SPACE_NAME, USER_GROUP_TABLE, userGroupMap, compositeKeyMap);
