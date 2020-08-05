@@ -34,10 +34,12 @@ public class RequestMapper {
       ((ObjectNode) requestData).set("headers", headerData);
 
       Request request = Json.fromJson(requestData, Request.class);
-      String contextStr = httpReq.flash().get(JsonKey.CONTEXT);
+      String contextStr = null;
+      if(httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.CONTEXT)){
+        contextStr = (String)httpReq.attrs().get(Attrs.CONTEXT);
+      }
       if (StringUtils.isNotBlank(contextStr)) {
-        Map<String, Object> contextObject =
-            mapper.readValue(httpReq.flash().get(JsonKey.CONTEXT), Map.class);
+        Map<String, Object> contextObject = mapper.readValue(contextStr, Map.class);
         request.setContext((Map<String, Object>) contextObject.get(JsonKey.CONTEXT));
       }
       String userId = null;
@@ -47,8 +49,12 @@ public class RequestMapper {
       logger.info(JsonKey.USER_ID + " in RequestMapper.createSBRequest(): " + userId);
       request.getContext().put(JsonKey.USER_ID, userId);
 
-      logger.info(JsonKey.MANAGED_FOR + " in RequestMapper.createSBRequest(): " + (String) httpReq.flash().get(JsonKey.MANAGED_FOR));
-      request.getContext().put(JsonKey.MANAGED_FOR, httpReq.flash().get(JsonKey.MANAGED_FOR));
+      String managedFor = null;
+      if(httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.MANAGED_FOR)){
+        managedFor = (String)httpReq.attrs().get(Attrs.MANAGED_FOR);
+      }
+      logger.info(JsonKey.MANAGED_FOR + " in RequestMapper.createSBRequest(): " + managedFor);
+      request.getContext().put(JsonKey.MANAGED_FOR, managedFor);
       request.setPath(httpReq.path());
 
       return request;

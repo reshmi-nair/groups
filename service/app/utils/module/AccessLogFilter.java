@@ -53,15 +53,20 @@ public class AccessLogFilter extends EssentialFilter {
                     params.put(JsonKey.DURATION, requestTime);
                     params.put(JsonKey.STATUS, result.status());
                     params.put(JsonKey.LOG_LEVEL, JsonKey.INFO);
-                    String contextDetails = request.flash().get(JsonKey.CONTEXT);
-                    Map<String, Object> context =
-                        objectMapper.readValue(
-                            contextDetails, new TypeReference<Map<String, Object>>() {});
+                    String contextDetails = null;
+                    Map<String, Object> context = null;
+                    if(request.attrs() != null && request.attrs().containsKey(Attrs.CONTEXT)){
+                      contextDetails = (String)request.attrs().get(Attrs.CONTEXT);
+                      context =
+                          objectMapper.readValue(
+                              contextDetails, new TypeReference<Map<String, Object>>() {});
+
+                    }
                     req.setRequest(
                         generateTelemetryRequestForController(
                             TelemetryEvents.LOG.getName(),
                             params,
-                            (Map<String, Object>) context.get(JsonKey.CONTEXT)));
+                                (context != null ? (Map<String, Object>) context.get(JsonKey.CONTEXT) : null)));
                     TelemetryWriter.write(req);
                   } catch (Exception ex) {
                     logger.info("AccessLogFilter:apply Exception in writing telemetry", ex);

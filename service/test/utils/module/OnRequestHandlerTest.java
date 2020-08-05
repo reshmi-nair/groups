@@ -56,12 +56,16 @@ public class OnRequestHandlerTest extends BaseRequestHandlerTest {
       Assert.assertTrue(false);
     }
     Assert.assertTrue(true);
-    String contextStr = req.flash().get(JsonKey.CONTEXT);
+    String contextStr = null;
+    if(req.attrs() != null && req.attrs().containsKey(Attrs.CONTEXT)){
+      contextStr = (String)req.attrs().get(Attrs.CONTEXT);
+
     Map<String, Object> contextObject =
-        mapper.readValue(req.flash().get(JsonKey.CONTEXT), Map.class);
+        mapper.readValue(contextStr, Map.class);
 
     Assert.assertEquals(
         JsonKey.DEFAULT_CONSUMER_ID,
         ((Map<String, Object>) contextObject.get(JsonKey.CONTEXT)).get(JsonKey.ACTOR_ID));
+    }
   }
 }
