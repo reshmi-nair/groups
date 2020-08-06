@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ public class Group implements Serializable {
   private String description;
   private String status;
   private String membershipType;
-  private List<Map<String, Object>> activities = new ArrayList<>();
+  private List<Map<String, Object>> activities;
   private Timestamp createdOn;
   private String createdBy;
   private Timestamp updatedOn;
