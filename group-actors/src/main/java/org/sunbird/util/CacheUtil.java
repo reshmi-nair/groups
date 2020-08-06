@@ -4,6 +4,7 @@ import akka.actor.ActorRef;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.sunbird.Application;
+import org.sunbird.cache.impl.RedisCache;
 import org.sunbird.models.ActorOperations;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import org.sunbird.util.helper.PropertiesCache;
+import scala.collection.JavaConverters;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -121,5 +124,11 @@ public class CacheUtil {
     Application.getInstance()
         .getActorRef(ActorOperations.DEL_CACHE.getValue())
         .tell(req, ActorRef.noSender());
+  }
+
+  public void deleteCacheSync(String key) {
+    logger.info("delete cache in sync from redis for the id {}", key);
+    RedisCache.delete(
+        JavaConverters.asScalaIteratorConverter(Arrays.asList(key).iterator()).asScala().toSeq());
   }
 }

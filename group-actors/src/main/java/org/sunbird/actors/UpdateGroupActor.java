@@ -92,7 +92,7 @@ public class UpdateGroupActor extends BaseActor {
             || StringUtils.isNotEmpty(group.getMembershipType())
             || StringUtils.isNotEmpty(group.getStatus())
             || CollectionUtils.isNotEmpty(group.getActivities()))) {
-      cacheUtil.delCache(group.getId());
+      cacheUtil.deleteCacheSync(group.getId());
       // if name, description and status update happens in group , delete cache for all the members
       // belongs to that group
       deleteFromUserCache = true;
@@ -104,6 +104,7 @@ public class UpdateGroupActor extends BaseActor {
         Boolean.parseBoolean(
             PropertiesCache.getInstance().getConfigValue(JsonKey.ENABLE_USERID_REDIS_CACHE));
     if (isUseridRedisEnabled) {
+      cacheUtil.deleteCacheSync(userId);
       // Remove group list user cache from redis
       deleteUserCache(
           (Map) actorMessage.getRequest().get(JsonKey.MEMBERS), membersInDB, deleteFromUserCache);
