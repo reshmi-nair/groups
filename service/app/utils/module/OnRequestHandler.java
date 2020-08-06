@@ -50,10 +50,14 @@ public class OnRequestHandler implements ActionCreator {
         CompletionStage<Result> result = checkForServiceHealth(request);
         if (result != null) return result;
 
-        String message = RequestInterceptor.verifyRequestData(request);
-        initializeContext(request, message);
+        Map userAuthentication = RequestInterceptor.verifyRequestData(request);
+        String message = (String)userAuthentication.get(JsonKey.USER_ID);
+        if(userAuthentication.get(JsonKey.MANAGED_FOR) != null) {
+          request = request.addAttr(Attrs.MANAGED_FOR, (String) userAuthentication.get(JsonKey.MANAGED_FOR));
+        }
+        request = initializeContext(request, message);
         if (!JsonKey.USER_UNAUTH_STATES.contains(message)) {
-          request.flash().put(JsonKey.USER_ID, message);
+          request = request.addAttr(Attrs.USERID, message);
           result = delegate.call(request);
         } else if (JsonKey.UNAUTHORIZED.equals(message)) {
           result = onDataValidationError(request, message);
@@ -111,7 +115,7 @@ public class OnRequestHandler implements ActionCreator {
    * @param httpReq
    * @param userId
    */
-  void initializeContext(Http.Request httpReq, String userId) {
+  Http.Request initializeContext(Http.Request httpReq, String userId) {
     try {
       Map<String, Object> requestContext = new WeakHashMap<>();
       String env = getEnv(httpReq);
@@ -154,7 +158,7 @@ public class OnRequestHandler implements ActionCreator {
       }
       Map<String, Object> map = new WeakHashMap<>();
       map.put(JsonKey.CONTEXT, requestContext);
-      httpReq.flash().put(JsonKey.CONTEXT, mapper.writeValueAsString(map));
+      return httpReq.addAttr(Attrs.CONTEXT, mapper.writeValueAsString(map));
     } catch (Exception ex) {
       logger.error("Error process set request context" + ex.getMessage());
       throw new BaseException(

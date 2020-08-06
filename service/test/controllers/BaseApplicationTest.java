@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.sunbird.exception.BaseException;
 import org.sunbird.response.Response;
 import org.sunbird.response.ResponseParams;
+import org.sunbird.util.JsonKey;
 import play.Application;
 import play.Mode;
 import play.inject.guice.GuiceApplicationBuilder;
@@ -57,8 +59,12 @@ public abstract class BaseApplicationTest {
       props = Props.create(actorClass);
       actorRef = system.actorOf(props);
       applicationSetUp();
+
+      Map userAuthentication = new HashMap<String,String>();
+      userAuthentication.put(JsonKey.USER_ID,"userId");
+
       PowerMockito.mockStatic(RequestInterceptor.class);
-      PowerMockito.when(RequestInterceptor.verifyRequestData(Mockito.any())).thenReturn("userId");
+      PowerMockito.when(RequestInterceptor.verifyRequestData(Mockito.any())).thenReturn(userAuthentication);
       PowerMockito.mockStatic(OnRequestHandler.class);
     } catch (Exception e) {
       System.out.println("exception occurred " + e.getMessage());

@@ -1,10 +1,8 @@
 package utils.module;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -39,9 +37,13 @@ public class RequestInterceptor {
    * @return User or Client ID for authenticated request. For unauthenticated requests, UNAUTHORIZED
    *     is returned release-3.0.0 on-wards validating managedBy token.
    */
-  public static String verifyRequestData(Http.Request request) {
+  public static Map verifyRequestData(Http.Request request) {
+    Map userAuthentication = new HashMap<String,String>();
+    userAuthentication.put(JsonKey.USER_ID,null);
+    userAuthentication.put(JsonKey.MANAGED_FOR,null);
+
     String clientId = JsonKey.UNAUTHORIZED;
-    request.flash().put(JsonKey.MANAGED_FOR, null);
+    String managedForId = null;
     Optional<String> accessToken = request.header(HeaderParam.X_Authenticated_User_Token.getName());
     // The API must be invoked with either access token or client token.
     if (!isRequestInExcludeList(request.path()) && !isRequestPrivate(request.path())) {
@@ -57,32 +59,20 @@ public class RequestInterceptor {
             String managedFor =
                 ManagedTokenValidator.verify(managedAccessToken, clientId);
             if (!JsonKey.USER_UNAUTH_STATES.contains(managedFor)) {
-              request.flash().put(JsonKey.MANAGED_FOR, managedFor);
+              managedForId = managedFor;
             } else {
               clientId = JsonKey.UNAUTHORIZED;
             }
           }
         }
       }
-      return clientId;
+      userAuthentication.put(JsonKey.USER_ID, clientId);
+      userAuthentication.put(JsonKey.MANAGED_FOR, managedForId);
+
     } else {
-      if (accessToken.isPresent()) {
-        String clientAccessTokenId = null;
-        try {
-          clientAccessTokenId = AuthenticationHelper.verifyUserAccesToken(accessToken.get());
-          if (JsonKey.UNAUTHORIZED.equalsIgnoreCase(clientAccessTokenId)) {
-            clientAccessTokenId = null;
-          }
-        } catch (Exception ex) {
-          logger.error(ex.getMessage(), ex);
-          clientAccessTokenId = null;
-        }
-        return StringUtils.isNotBlank(clientAccessTokenId)
-            ? clientAccessTokenId
-            : JsonKey.ANONYMOUS;
-      }
-      return JsonKey.ANONYMOUS;
+      userAuthentication.put(JsonKey.USER_ID, JsonKey.ANONYMOUS);
     }
+    return userAuthentication;
   }
 
   /**
