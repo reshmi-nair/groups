@@ -31,6 +31,7 @@ import org.sunbird.util.helper.PropertiesCache;
   dispatcher = "group-dispatcher"
 )
 public class CreateGroupActor extends BaseActor {
+  private CacheUtil cacheUtil = new CacheUtil();
 
   @Override
   public void onReceive(Request request) throws Throwable {
@@ -57,11 +58,11 @@ public class CreateGroupActor extends BaseActor {
     Group group = requestHandler.handleCreateGroupRequest(actorMessage);
 
     String userId = group.getCreatedBy();
-    if(StringUtils.isEmpty(userId)){
+    if (StringUtils.isEmpty(userId)) {
       throw new BaseException(
-              IResponseMessage.Key.UNAUTHORIZED_USER,
-              IResponseMessage.Message.UNAUTHORIZED_USER,
-              ResponseCode.UNAUTHORIZED.getCode());
+          IResponseMessage.Key.UNAUTHORIZED_USER,
+          IResponseMessage.Message.UNAUTHORIZED_USER,
+          ResponseCode.UNAUTHORIZED.getCode());
     }
 
     // add creator of group to memberList as admin
@@ -79,10 +80,12 @@ public class CreateGroupActor extends BaseActor {
     }
 
     logger.info("Fetching groups from user-group for userId {}", userId);
-    List<Map<String, Object>> userGroupsList = memberService.getGroupIdsforUserIds(GroupUtil.getMemberIdListFromMap(memberList));
+    List<Map<String, Object>> userGroupsList =
+        memberService.getGroupIdsforUserIds(GroupUtil.getMemberIdListFromMap(memberList));
     GroupUtil.checkMaxGroupLimit(userGroupsList, userId);
     GroupUtil.checkMaxMemberLimit(memberList.size());
-    GroupUtil.checkMaxActivityLimit(group.getActivities().size());
+    GroupUtil.checkMaxActivityLimit(
+        group.getActivities() != null ? group.getActivities().size() : 0);
     String groupId = groupService.createGroup(group);
 
     if (CollectionUtils.isNotEmpty(memberList)) {
@@ -91,11 +94,12 @@ public class CreateGroupActor extends BaseActor {
           Boolean.parseBoolean(
               PropertiesCache.getInstance().getConfigValue(JsonKey.ENABLE_USERID_REDIS_CACHE));
       if (isUseridRedisEnabled) {
+        // Remove group list user cache from redis
+        cacheUtil.deleteCacheSync(userId);
         deleteUserCache(memberList);
       }
       Response addMembersRes =
-          memberService.handleMemberAddition(
-              memberList, groupId, userId, userGroupsList);
+          memberService.handleMemberAddition(memberList, groupId, userId, userGroupsList);
       logger.info(
           "Adding members to the group : {} ended , response {}",
           groupId,
@@ -118,25 +122,25 @@ public class CreateGroupActor extends BaseActor {
 
   private void logTelemetry(Request actorMessage, String groupId) {
     String source =
-            actorMessage.getContext().get(JsonKey.REQUEST_SOURCE) != null
-                    ? (String) actorMessage.getContext().get(JsonKey.REQUEST_SOURCE)
-                    : "";
+        actorMessage.getContext().get(JsonKey.REQUEST_SOURCE) != null
+            ? (String) actorMessage.getContext().get(JsonKey.REQUEST_SOURCE)
+            : "";
 
     List<Map<String, Object>> correlatedObject = new ArrayList<>();
     if (StringUtils.isNotBlank(source)) {
       TelemetryUtil.generateCorrelatedObject(
-              source, StringUtils.capitalize(JsonKey.REQUEST_SOURCE), null, correlatedObject);
+          source, StringUtils.capitalize(JsonKey.REQUEST_SOURCE), null, correlatedObject);
     }
     Map<String, Object> targetObject = null;
     targetObject =
-            TelemetryUtil.generateTargetObject(groupId, TelemetryEnvKey.GROUP, JsonKey.CREATE, null);
+        TelemetryUtil.generateTargetObject(groupId, TelemetryEnvKey.GROUP, JsonKey.CREATE, null);
 
     TelemetryUtil.generateCorrelatedObject(
-            (String) actorMessage.getContext().get(JsonKey.USER_ID),
-            TelemetryEnvKey.USER,
-            null,
-            correlatedObject);
+        (String) actorMessage.getContext().get(JsonKey.USER_ID),
+        TelemetryEnvKey.USER,
+        null,
+        correlatedObject);
     TelemetryUtil.telemetryProcessingCall(
-            actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
+        actorMessage.getRequest(), targetObject, correlatedObject, actorMessage.getContext());
   }
 }

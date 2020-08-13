@@ -55,7 +55,7 @@ public class ReadGroupActor extends BaseActor {
     if (StringUtils.isNotEmpty(groupInfo)) {
       groupResponse = JsonUtils.deserialize(groupInfo, GroupResponse.class);
     } else {
-      logger.info("read group cache is empty. Fetching details from DB");
+      logger.info("read group cache is empty. Fetching details from DB for groupId - {} ", groupId);
       groupResponse = groupService.readGroup(groupId);
       cacheUtil.setCache(groupId, JsonUtils.serialize(groupResponse), CacheUtil.groupTtl);
     }
@@ -66,7 +66,9 @@ public class ReadGroupActor extends BaseActor {
         memberResponses =
             JsonUtils.deserialize(groupMember, new TypeReference<List<MemberResponse>>() {});
       } else {
-        logger.info("read group member cache is empty. Fetching details from DB");
+        logger.info(
+            "read group member cache is empty. Fetching details from DB for groupId - {} ",
+            groupId);
         memberResponses = memberService.readGroupMembers(groupId);
         cacheUtil.setCache(
             constructRedisIdentifier(groupId),

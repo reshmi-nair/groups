@@ -12,7 +12,7 @@ GET  /:service/health                         @controllers.HealthController.getS
 POST	/v1/group/create				      @controllers.CreateGroupController.createGroup(request: play.mvc.Http.Request)
 PATCH	/v1/group/update				      @controllers.UpdateGroupController.updateGroup(request: play.mvc.Http.Request)
 GET	/v1/group/read/:groupId				      @controllers.ReadGroupController.readGroup(groupId: String, request: play.mvc.Http.Request)
-
+GET	/private/v1/group/read/:groupId			  @controllers.ReadGroupController.readGroup(groupId: String, request: play.mvc.Http.Request)
 #Search APIs
 
 POST   /v1/group/list                         @controllers.SearchGroupController.searchGroup(request: play.mvc.Http.Request)
