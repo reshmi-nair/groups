@@ -98,7 +98,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <build>
+   <!-- <build>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
         <plugins>
@@ -143,7 +143,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.20</version>
                 <configuration>
-                    <!-- <skipTests>true</skipTests> -->
+                    &lt;!&ndash; <skipTests>true</skipTests> &ndash;&gt;
                     <includes>
                         <include>**/*Spec.java</include>
                         <include>**/*Test.java</include>
@@ -171,5 +171,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 </project>
