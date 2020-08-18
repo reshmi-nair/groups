@@ -60,6 +60,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.4</version>
+                <configuration>
+                    <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+                    <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+                    <excludes>
+                        <exclude>**/common/**</exclude>
+                        <exclude>**/router/**</exclude>
+                        <exclude>**/Reverse*/**</exclude>
+                        <exclude>**/routes.*</exclude>
+                        <exclude>**/routes$javascript.**</exclude>
+                        <exclude>org/sunbird/models/**/*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
