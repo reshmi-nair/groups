@@ -35,28 +35,32 @@ public class RequestMapper {
 
       Request request = Json.fromJson(requestData, Request.class);
       String contextStr = null;
-      if(httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.CONTEXT)){
-        contextStr = (String)httpReq.attrs().get(Attrs.CONTEXT);
+      if (httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.CONTEXT)) {
+        contextStr = (String) httpReq.attrs().get(Attrs.CONTEXT);
       }
       if (StringUtils.isNotBlank(contextStr)) {
         Map<String, Object> contextObject = mapper.readValue(contextStr, Map.class);
         request.setContext((Map<String, Object>) contextObject.get(JsonKey.CONTEXT));
       }
       String userId = null;
-      if(httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.USERID)){
-        userId = (String)httpReq.attrs().get(Attrs.USERID);
+      if (httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.USERID)) {
+        userId = (String) httpReq.attrs().get(Attrs.USERID);
       }
       logger.info(JsonKey.USER_ID + " in RequestMapper.createSBRequest(): " + userId);
       request.getContext().put(JsonKey.USER_ID, userId);
 
       String managedFor = null;
-      if(httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.MANAGED_FOR)){
-        managedFor = (String)httpReq.attrs().get(Attrs.MANAGED_FOR);
+      if (httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.MANAGED_FOR)) {
+        managedFor = (String) httpReq.attrs().get(Attrs.MANAGED_FOR);
+      }
+      String startTime = null;
+      if (httpReq.attrs() != null && httpReq.attrs().containsKey(Attrs.START_TIME)) {
+        startTime = (String) httpReq.attrs().get(Attrs.START_TIME);
       }
       logger.info(JsonKey.MANAGED_FOR + " in RequestMapper.createSBRequest(): " + managedFor);
       request.getContext().put(JsonKey.MANAGED_FOR, managedFor);
       request.setPath(httpReq.path());
-
+      request.setTs(startTime);
       return request;
     } catch (Exception ex) {
       logger.error("Error process set request context" + ex.getMessage());

@@ -91,7 +91,8 @@ public class UpdateGroupActor extends BaseActor {
             || StringUtils.isNotEmpty(group.getName())
             || StringUtils.isNotEmpty(group.getMembershipType())
             || StringUtils.isNotEmpty(group.getStatus())
-            || CollectionUtils.isNotEmpty(group.getActivities()))) {
+            || MapUtils.isNotEmpty(
+                (Map<String, Object>) actorMessage.getRequest().get(JsonKey.ACTIVITIES)))) {
       cacheUtil.deleteCacheSync(group.getId());
       // if name, description and status update happens in group , delete cache for all the members
       // belongs to that group
