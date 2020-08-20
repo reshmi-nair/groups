@@ -12,7 +12,7 @@ jobs:
           key: groups-dependency-cache-{{ checksum "pom.xml" }}
       - run:
           name: Build the code
-          command: mvn clean install -U -DskipTests=true
+          command: mvn clean install
       - run:
           name: Save the build artifact
           command: cd service && mvn play2:dist
