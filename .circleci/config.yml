@@ -24,7 +24,7 @@ jobs:
           destination: "/tmp/group-service.zip"
       - run:
           name: sonar
-          command: mvn verify -DskipTests sonar:sonar -Dsonar.projectKey=project-sunbird_groups-service -Dsonar.organization=project-sunbird -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.jacoco.xmlReportPaths=/home/circleci/project/reports/target/jacoco/jacoco.xml
+          command: mvn verify -DskipTests sonar:sonar -Dsonar.projectKey=project-sunbird_groups-service -Dsonar.organization=project-sunbird -Dsonar.host.url=https://sonarcloud.io -Dsonar.coverage.exclusions=**/cassandra-utils/**,**/platform-cache/**,**/sb-actor/**,**/sb-telemetry-utils/**,**/sb-utils/**, -Dsonar.coverage.jacoco.xmlReportPaths=/home/circleci/project/reports/target/jacoco/jacoco.xml
 workflows:
   version: 2.1
   workflow:
