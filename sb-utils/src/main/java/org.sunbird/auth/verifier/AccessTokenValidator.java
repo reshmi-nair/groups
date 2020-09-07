@@ -98,9 +98,9 @@ public class AccessTokenValidator {
 
   private static boolean checkIss(String iss) {
     String realmUrl =
-        propertiesCache.getProperty(JsonKey.SSO_URL)
+        propertiesCache.getProperty(JsonKey.SUNBIRD_SSO_URL)
             + "realms/"
-            + propertiesCache.getProperty(JsonKey.SSO_REALM);
+            + propertiesCache.getProperty(JsonKey.SUNBIRD_SSO_REALM);
     return (realmUrl.equalsIgnoreCase(iss));
   }
 

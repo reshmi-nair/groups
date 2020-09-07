@@ -46,8 +46,8 @@ public interface JsonKey {
   String GROUP = "group";
   String UNAUTHORIZED = "Unauthorized";
   String MANAGED_FOR = "managedFor";
-  String SSO_REALM = "sso.realm";
-  String SSO_URL = "sso.url";
+  String SUNBIRD_SSO_REALM = "sunbird_sso_realm";
+  String SUNBIRD_SSO_URL = "sunbird_sso_url";
   String ANONYMOUS = "Anonymous";
   List<String> USER_UNAUTH_STATES = Arrays.asList(JsonKey.UNAUTHORIZED, JsonKey.ANONYMOUS);
   String REQUEST = "request";
