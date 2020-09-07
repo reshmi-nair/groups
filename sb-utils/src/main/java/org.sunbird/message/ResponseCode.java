@@ -5,9 +5,6 @@ import org.sunbird.util.JsonKey;
 
 public enum ResponseCode {
   unAuthorized(IResponseMessage.Key.UNAUTHORIZED_USER, IResponseMessage.Message.UNAUTHORIZED_USER),
-  keyCloakDefaultError(
-      IResponseMessage.Key.KEY_CLOAK_DEFAULT_ERROR,
-      IResponseMessage.Message.KEY_CLOAK_DEFAULT_ERROR),
   unableToCommunicateWithActor(
       IResponseMessage.Key.UNABLE_TO_COMMUNICATE_WITH_ACTOR,
       IResponseMessage.Message.UNABLE_TO_COMMUNICATE_WITH_ACTOR),

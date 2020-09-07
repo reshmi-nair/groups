@@ -9,14 +9,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.keycloak.common.util.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.sso.KeyCloakConnectionProvider;
 import org.sunbird.util.JsonKey;
 import org.sunbird.util.LoggerEnum;
+import org.sunbird.util.helper.PropertiesCache;
 
 public class AccessTokenValidator {
 
   static Logger logger = LoggerFactory.getLogger(AccessTokenValidator.class);
   private static ObjectMapper mapper = new ObjectMapper();
+  private static PropertiesCache propertiesCache = PropertiesCache.getInstance();
 
   private static Map<String, Object> validateToken(String token) throws JsonProcessingException {
     String[] tokenElements = token.split("\\.");
@@ -97,7 +98,9 @@ public class AccessTokenValidator {
 
   private static boolean checkIss(String iss) {
     String realmUrl =
-        KeyCloakConnectionProvider.SSO_URL + "realms/" + KeyCloakConnectionProvider.SSO_REALM;
+        propertiesCache.getProperty(JsonKey.SSO_URL)
+            + "realms/"
+            + propertiesCache.getProperty(JsonKey.SSO_REALM);
     return (realmUrl.equalsIgnoreCase(iss));
   }
 
