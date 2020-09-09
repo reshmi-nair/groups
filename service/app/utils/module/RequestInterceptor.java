@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.auth.verifier.ManagedTokenValidator;
+import org.sunbird.auth.verifier.AccessTokenValidator;
 import org.sunbird.request.HeaderParam;
 import org.sunbird.util.JsonKey;
 import play.mvc.Http;
@@ -38,9 +38,9 @@ public class RequestInterceptor {
    *     is returned release-3.0.0 on-wards validating managedBy token.
    */
   public static Map verifyRequestData(Http.Request request) {
-    Map userAuthentication = new HashMap<String,String>();
-    userAuthentication.put(JsonKey.USER_ID,null);
-    userAuthentication.put(JsonKey.MANAGED_FOR,null);
+    Map userAuthentication = new HashMap<String, String>();
+    userAuthentication.put(JsonKey.USER_ID, null);
+    userAuthentication.put(JsonKey.MANAGED_FOR, null);
 
     String clientId = JsonKey.UNAUTHORIZED;
     String managedForId = null;
@@ -48,16 +48,16 @@ public class RequestInterceptor {
     // The API must be invoked with either access token or client token.
     if (!isRequestInExcludeList(request.path()) && !isRequestPrivate(request.path())) {
       if (accessToken.isPresent()) {
-        clientId = AuthenticationHelper.verifyUserAccesToken(accessToken.get());
+        clientId = AccessTokenValidator.verifyUserToken(accessToken.get());
         if (!JsonKey.USER_UNAUTH_STATES.contains(clientId)) {
           // Now we have some valid token, next verify managed user token.
           // LUA - MUA user combo, check the 'for' token and its parent, child identifiers
           Optional<String> forTokenHeader =
-                  request.header(HeaderParam.X_Authenticated_For.getName());
+              request.header(HeaderParam.X_Authenticated_For.getName());
           String managedAccessToken = forTokenHeader.isPresent() ? forTokenHeader.get() : "";
           if (StringUtils.isNotEmpty(managedAccessToken)) {
             String managedFor =
-                ManagedTokenValidator.verify(managedAccessToken, clientId);
+                AccessTokenValidator.verifyManagedUserToken(managedAccessToken, clientId);
             if (!JsonKey.USER_UNAUTH_STATES.contains(managedFor)) {
               managedForId = managedFor;
             } else {

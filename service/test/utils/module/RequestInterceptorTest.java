@@ -14,30 +14,31 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.sunbird.auth.verifier.ManagedTokenValidator;
+import org.sunbird.auth.verifier.AccessTokenValidator;
 import org.sunbird.util.JsonKey;
 import play.mvc.Http;
 import play.test.Helpers;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({RequestInterceptor.class, AuthenticationHelper.class, ManagedTokenValidator.class})
+@PrepareForTest({RequestInterceptor.class, AccessTokenValidator.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 public class RequestInterceptorTest {
 
-  private static AuthenticationHelper authenticationHelper;
-  private static ManagedTokenValidator managedTokenValidator;
+  private static AccessTokenValidator tokenValidator;
 
   @Test
   public void testIsRequestInExcludeListWithResAnonymous() {
-    authenticationHelper = mock(AuthenticationHelper.class);
-    PowerMockito.mockStatic(AuthenticationHelper.class);
+    tokenValidator = mock(AccessTokenValidator.class);
+    PowerMockito.mockStatic(AccessTokenValidator.class);
     Http.RequestBuilder requestBuilder =
         Helpers.fakeRequest(Helpers.GET, "http://localhost:9000/service/health")
             .header(
                 "x-authenticated-user-token",
                 "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyZUNvWGlZRHFDbHRaX1F1ZXNRMEhtNkNYVF91emJiN2d3bXlMZXhsN1JnIn0.eyJqdGkiOiIwMTVmNmRlOC1jODRiLTRkNmUtOGRkYy1mNzZmNTk3NTViNjgiLCJleHAiOjE1OTQxMDg0MjUsIm5iZiI6MCwiaWF0IjoxNTk0MDIyMDI1LCJpc3MiOiJodHRwczovL3N0YWdpbmcubnRwLm5ldC5pbi9hdXRoL3JlYWxtcy9zdW5iaXJkIiwiYXVkIjoiYWRtaW4tY2xpIiwic3ViIjoiZjo5MzFhOWRjOS00NTk0LTQ4MzktYWExNi1jZjBjYWMwOTYzODE6M2Y0YmYzMTEtOTNkMy00ODY3LTgxMGMtZGViMDYzYjQzNzg5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYWRtaW4tY2xpIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiZGFmYzU0YmUtNmZkOS00MDRlLTljYzctN2FkYzYxYzVjYzI1IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6W10sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7fSwibmFtZSI6Ik5hdjIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJuYXYyMzMzNyIsImdpdmVuX25hbWUiOiJOYXYyIiwiZW1haWwiOiJuYXYyQHlvcG1haWwuY29tIn0.HAG5Uv7F7J82HCmNsM9NjzMKEW_65nsJX-P_SC5XNfSoz9w5FkQQ4Xlx9elw5vbvtG9UU5Jn5TDMRGAnjdCZ-FMgMv0BLGy3uRKq6Xu6drf6oN9kYMIgTGYuf946EX3pelXQtL6kXwi5_OQ6OQT7Ie94l525BEn09SkeiKJsUrrxShLMlCaX3ERt83MwNdxLkuJ0tI8Jx22leksaf8cxGteC3iF31eLVxIe3ioIexUpbbTI-zBZHHURX_5tAIZvq91kV7Laibngqg4RDluaBltmbBWufFBPAYHqwFRvhix2E78t3d6cb7mx4xRNDrbTJCxHQCL2kE-VXkPGBDEHa3g");
     ;
-    assertEquals((String)RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID), "Anonymous");
+    assertEquals(
+        (String) RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID),
+        "Anonymous");
   }
 
   @Test
@@ -48,10 +49,8 @@ public class RequestInterceptorTest {
 
   @Test
   public void testVerifyRequestDataReturnsAuthorizedUser() {
-    authenticationHelper = mock(AuthenticationHelper.class);
-    managedTokenValidator = mock(ManagedTokenValidator.class);
-    PowerMockito.mockStatic(AuthenticationHelper.class);
-    PowerMockito.mockStatic(ManagedTokenValidator.class);
+    tokenValidator = mock(AccessTokenValidator.class);
+    PowerMockito.mockStatic(AccessTokenValidator.class);
     ObjectNode requestNode = JsonNodeFactory.instance.objectNode();
     ObjectNode userNode = JsonNodeFactory.instance.objectNode();
     userNode.put(JsonKey.USER_ID, "56c2d9a3-fae9-4341-9862-4eeeead2e9a1");
@@ -66,20 +65,18 @@ public class RequestInterceptorTest {
                 "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyZUNvWGlZRHFDbHRaX1F1ZXNRMEhtNkNYVF91emJiN2d3bXlMZXhsN1JnIn0.eyJqdGkiOiIwMTVmNmRlOC1jODRiLTRkNmUtOGRkYy1mNzZmNTk3NTViNjgiLCJleHAiOjE1OTQxMDg0MjUsIm5iZiI6MCwiaWF0IjoxNTk0MDIyMDI1LCJpc3MiOiJodHRwczovL3N0YWdpbmcubnRwLm5ldC5pbi9hdXRoL3JlYWxtcy9zdW5iaXJkIiwiYXVkIjoiYWRtaW4tY2xpIiwic3ViIjoiZjo5MzFhOWRjOS00NTk0LTQ4MzktYWExNi1jZjBjYWMwOTYzODE6M2Y0YmYzMTEtOTNkMy00ODY3LTgxMGMtZGViMDYzYjQzNzg5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYWRtaW4tY2xpIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiZGFmYzU0YmUtNmZkOS00MDRlLTljYzctN2FkYzYxYzVjYzI1IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6W10sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7fSwibmFtZSI6Ik5hdjIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJuYXYyMzMzNyIsImdpdmVuX25hbWUiOiJOYXYyIiwiZW1haWwiOiJuYXYyQHlvcG1haWwuY29tIn0.HAG5Uv7F7J82HCmNsM9NjzMKEW_65nsJX-P_SC5XNfSoz9w5FkQQ4Xlx9elw5vbvtG9UU5Jn5TDMRGAnjdCZ-FMgMv0BLGy3uRKq6Xu6drf6oN9kYMIgTGYuf946EX3pelXQtL6kXwi5_OQ6OQT7Ie94l525BEn09SkeiKJsUrrxShLMlCaX3ERt83MwNdxLkuJ0tI8Jx22leksaf8cxGteC3iF31eLVxIe3ioIexUpbbTI-zBZHHURX_5tAIZvq91kV7Laibngqg4RDluaBltmbBWufFBPAYHqwFRvhix2E78t3d6cb7mx4xRNDrbTJCxHQCL2kE-VXkPGBDEHa3g")
             .bodyJson(requestNode);
     Http.Request req = requestBuilder.build();
-    when(authenticationHelper.verifyUserAccesToken(Mockito.anyString()))
+    when(tokenValidator.verifyUserToken(Mockito.anyString())).thenReturn("authorized-user");
+    when(tokenValidator.verifyManagedUserToken(Mockito.anyString(), Mockito.anyString()))
         .thenReturn("authorized-user");
-    when(ManagedTokenValidator.verify(
-            Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-        .thenReturn("authorized-user");
-    assertEquals((String)RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID), "authorized-user");
+    assertEquals(
+        (String) RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID),
+        "authorized-user");
   }
 
   @Test
   public void testVerifyRequestDataReturnsAuthorizedUserForGET() {
-    authenticationHelper = mock(AuthenticationHelper.class);
-    managedTokenValidator = mock(ManagedTokenValidator.class);
-    PowerMockito.mockStatic(AuthenticationHelper.class);
-    PowerMockito.mockStatic(ManagedTokenValidator.class);
+    tokenValidator = mock(AccessTokenValidator.class);
+    PowerMockito.mockStatic(AccessTokenValidator.class);
     ObjectNode requestNode = JsonNodeFactory.instance.objectNode();
     ObjectNode userNode = JsonNodeFactory.instance.objectNode();
     userNode.put(JsonKey.USER_ID, "56c2d9a3-fae9-4341-9862-4eeeead2e9a1");
@@ -95,23 +92,25 @@ public class RequestInterceptorTest {
                 "x-authenticated-for",
                 "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyZUNvWGlZRHFDbHRaX1F1ZXNRMEhtNkNYVF91emJiN2d3bXlMZXhsN1JnIn0.eyJqdGkiOiIwMTVmNmRlOC1jODRiLTRkNmUtOGRkYy1mNzZmNTk3NTViNjgiLCJleHAiOjE1OTQxMDg0MjUsIm5iZiI6MCwiaWF0IjoxNTk0MDIyMDI1LCJpc3MiOiJodHRwczovL3N0YWdpbmcubnRwLm5ldC5pbi9hdXRoL3JlYWxtcy9zdW5iaXJkIiwiYXVkIjoiYWRtaW4tY2xpIiwic3ViIjoiZjo5MzFhOWRjOS00NTk0LTQ4MzktYWExNi1jZjBjYWMwOTYzODE6M2Y0YmYzMTEtOTNkMy00ODY3LTgxMGMtZGViMDYzYjQzNzg5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYWRtaW4tY2xpIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiZGFmYzU0YmUtNmZkOS00MDRlLTljYzctN2FkYzYxYzVjYzI1IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6W10sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7fSwibmFtZSI6Ik5hdjIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJuYXYyMzMzNyIsImdpdmVuX25hbWUiOiJOYXYyIiwiZW1haWwiOiJuYXYyQHlvcG1haWwuY29tIn0.HAG5Uv7F7J82HCmNsM9NjzMKEW_65nsJX-P_SC5XNfSoz9w5FkQQ4Xlx9elw5vbvtG9UU5Jn5TDMRGAnjdCZ-FMgMv0BLGy3uRKq6Xu6drf6oN9kYMIgTGYuf946EX3pelXQtL6kXwi5_OQ6OQT7Ie94l525BEn09SkeiKJsUrrxShLMlCaX3ERt83MwNdxLkuJ0tI8Jx22leksaf8cxGteC3iF31eLVxIe3ioIexUpbbTI-zBZHHURX_5tAIZvq91kV7Laibngqg4RDluaBltmbBWufFBPAYHqwFRvhix2E78t3d6cb7mx4xRNDrbTJCxHQCL2kE-VXkPGBDEHa3g");
     Http.Request req = requestBuilder.build();
-    when(authenticationHelper.verifyUserAccesToken(Mockito.anyString()))
+    when(tokenValidator.verifyUserToken(Mockito.anyString())).thenReturn("authorized-user");
+    when(tokenValidator.verifyManagedUserToken(Mockito.anyString(), Mockito.anyString()))
         .thenReturn("authorized-user");
-    when(ManagedTokenValidator.verify(
-            Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-        .thenReturn("authorized-user");
-    assertEquals((String)RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID), "authorized-user");
+    assertEquals(
+        (String) RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID),
+        "authorized-user");
   }
 
   @Test
   public void testVerifyRequestDataReturingUnAuthorizedUser() {
-    authenticationHelper = mock(AuthenticationHelper.class);
+    tokenValidator = mock(AccessTokenValidator.class);
     Http.RequestBuilder requestBuilder =
         Helpers.fakeRequest(Helpers.GET, "http://localhost:9000/v1/group/read")
             .header(
                 "x-authenticated-user-token",
                 "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyZUNvWGlZRHFDbHRaX1F1ZXNRMEhtNkNYVF91emJiN2d3bXlMZXhsN1JnIn0.eyJqdGkiOiIwMTVmNmRlOC1jODRiLTRkNmUtOGRkYy1mNzZmNTk3NTViNjgiLCJleHAiOjE1OTQxMDg0MjUsIm5iZiI6MCwiaWF0IjoxNTk0MDIyMDI1LCJpc3MiOiJodHRwczovL3N0YWdpbmcubnRwLm5ldC5pbi9hdXRoL3JlYWxtcy9zdW5iaXJkIiwiYXVkIjoiYWRtaW4tY2xpIiwic3ViIjoiZjo5MzFhOWRjOS00NTk0LTQ4MzktYWExNi1jZjBjYWMwOTYzODE6M2Y0YmYzMTEtOTNkMy00ODY3LTgxMGMtZGViMDYzYjQzNzg5IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYWRtaW4tY2xpIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiZGFmYzU0YmUtNmZkOS00MDRlLTljYzctN2FkYzYxYzVjYzI1IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6W10sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7fSwibmFtZSI6Ik5hdjIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJuYXYyMzMzNyIsImdpdmVuX25hbWUiOiJOYXYyIiwiZW1haWwiOiJuYXYyQHlvcG1haWwuY29tIn0.HAG5Uv7F7J82HCmNsM9NjzMKEW_65nsJX-P_SC5XNfSoz9w5FkQQ4Xlx9elw5vbvtG9UU5Jn5TDMRGAnjdCZ-FMgMv0BLGy3uRKq6Xu6drf6oN9kYMIgTGYuf946EX3pelXQtL6kXwi5_OQ6OQT7Ie94l525BEn09SkeiKJsUrrxShLMlCaX3ERt83MwNdxLkuJ0tI8Jx22leksaf8cxGteC3iF31eLVxIe3ioIexUpbbTI-zBZHHURX_5tAIZvq91kV7Laibngqg4RDluaBltmbBWufFBPAYHqwFRvhix2E78t3d6cb7mx4xRNDrbTJCxHQCL2kE-VXkPGBDEHa3g");
     Http.Request req = requestBuilder.build();
-    assertEquals((String)RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID), JsonKey.UNAUTHORIZED);
+    assertEquals(
+        (String) RequestInterceptor.verifyRequestData(requestBuilder.build()).get(JsonKey.USER_ID),
+        JsonKey.UNAUTHORIZED);
   }
 }

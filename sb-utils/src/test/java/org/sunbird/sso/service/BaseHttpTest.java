@@ -20,18 +20,10 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.sunbird.sso.KeyCloakConnectionProvider;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
-@PrepareForTest({
-  OutputStreamWriter.class,
-  URL.class,
-  BufferedReader.class,
-  HttpClients.class,
-  KeyCloakConnectionProvider.class,
-  KeyCloakServiceImpl.class
-})
+@PrepareForTest({OutputStreamWriter.class, URL.class, BufferedReader.class, HttpClients.class})
 public abstract class BaseHttpTest {
 
   @Before
