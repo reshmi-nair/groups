@@ -114,6 +114,7 @@ public interface JsonKey {
   String USER_REDIS_TTL = "user_redis_ttl";
   String X_REQUEST_ID = "X-Request-ID";
   String ERROR_CODE = "errorCode";
+  String ERROR_MESSAGE = "errorMessage";
   String MEMBER_EXISTS = "MEMBER_EXISTS";
   String MEMBER_NOT_FOUND = "MEMBER_NOT_FOUND";
   String MAX_GROUP_LIMIT = "max_group_limit";
