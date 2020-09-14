@@ -1,6 +1,6 @@
 {
   "activities": [{
-  "type": ["Course","TextBook"],
+  "type": ["Course","TextBook","ExplanationContent","PracticeResource","PracticeQuestionSet","Collection","Resource"],
   "serviceClass": "org.sunbird.util.ContentSearchUtil",
   "fields": [
     "identifier",
