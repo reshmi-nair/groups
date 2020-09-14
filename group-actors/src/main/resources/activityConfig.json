@@ -32,7 +32,9 @@
     "batches",
     "leafNodes",
     "leafNodesCount",
-    "lastUpdatedOn"
+    "lastUpdatedOn",
+    "primaryCategory",
+    "trackable"
   ]
   }]
 }
