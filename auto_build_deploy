@@ -28,14 +28,10 @@ node('build-slave') {
             echo "build_tag: " + build_tag
 
            // stage('Build') {
-                currentDir = sh(returnStdout: true, script: 'pwd').trim()
                 env.NODE_ENV = "build"
                 print "Environment will be : ${env.NODE_ENV}"
                 sh 'git log -1'
-            sh "cd $currentDir"
-            //    sh 'mvn clean install -U -DskipTests=true '
-            sh 'mvn clean install'
-
+                sh 'mvn clean install -U -DskipTests=true '
             //}
             //stage('Package') {
                 dir('service') {
